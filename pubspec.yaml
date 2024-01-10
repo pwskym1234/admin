@@ -39,6 +39,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  dio: ^5.4.0 # 이곳에 원하는 dio 버전을 기입하세요
+  flutter_riverpod: ^2.4.9 # 이곳에 원하는 flutter_riverpod 버전을 기입하세요
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
