@@ -53,4 +53,39 @@ class ApiService {
       throw Exception('Error fetching panel list: $e');
     }
   }
+
+  Future<void> addPanelToVideo(int videoId, int panelId) async {
+    final response =
+        await _dio.post('https://a-zit.tv/api/v1/video/panel/create', data: {
+      'video': videoId,
+      'panel': panelId,
+    });
+
+    if (response.statusCode == 200) {
+      print('Panel added successfully');
+    } else {
+      print('Failed to add panel');
+    }
+  }
+
+  Future<void> removePanelFromVideo(int videoId, int panelId) async {
+    try {
+      final response = await _dio.post(
+        'https://a-zit.tv/api/v1/video/panel/delete',
+        data: {
+          'video': videoId,
+          'panel': panelId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Panel successfully removed');
+      } else {
+        print('Failed to remove panel');
+      }
+    } catch (e) {
+      print('Exception occurred while removing panel: $e');
+      throw Exception('Exception occurred while removing panel: $e');
+    }
+  }
 }
