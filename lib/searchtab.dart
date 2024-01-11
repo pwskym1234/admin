@@ -11,7 +11,9 @@ class SearchTab extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+       
         children: [
+          
           TextField(
             onChanged: (query) {
               ref.read(searchQueryProvider.notifier).state = query;
@@ -27,15 +29,19 @@ class SearchTab extends ConsumerWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Consumer(
+          
+            Consumer(
               builder: (context, ref, child) {
                 final panelListAsyncValue = ref.watch(panelListProvider);
 
                 return panelListAsyncValue.when(
                   data: (panelDataList) {
                     if (panelDataList.isNotEmpty) {
-                      return ListView.builder(
+                    
+                      return  
+                      Container(
+                        height: 100,
+                       child: ListView.builder(
                         itemCount: panelDataList.length,
                         itemBuilder: (context, index) {
                           final panelData = panelDataList[index];
@@ -43,7 +49,7 @@ class SearchTab extends ConsumerWidget {
                             title: Text(panelData['name'].toString()),
                           );
                         },
-                      );
+                      ));
                     } else {
                       return Center(
                         child: Text('결과가 없습니다.'),
@@ -59,7 +65,7 @@ class SearchTab extends ConsumerWidget {
                 );
               },
             ),
-          ),
+          
         ],
       ),
     );

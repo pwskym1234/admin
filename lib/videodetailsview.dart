@@ -43,6 +43,8 @@ class VideoDetailsView extends ConsumerWidget {
         return youtubeId != null
             ? Container(
   width: 600, // 원하는 너비
+  height: 1000,
+
 
   child: YoutubePlayerBuilder(
     player: YoutubePlayer(
@@ -59,7 +61,7 @@ class VideoDetailsView extends ConsumerWidget {
         Text(videoData['title'],
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
         player,
-        // SearchTab()
+        SearchTab()
         
 
         // 다른 필요한 데이터를 여기에 추가합니다.
@@ -67,6 +69,7 @@ class VideoDetailsView extends ConsumerWidget {
     ),
   ),
 )
+
             : Text('Invalid YouTube URL');
       },
     );

@@ -49,11 +49,8 @@ class MyHomePage extends ConsumerWidget {
           SizedBox(width: 20,), 
             
 
-            //  VideoDetailsView(videoId: selectedVideoId??0),
-            Container(
-              width: 500,
-              child: SearchTab(),
-            ),
+             VideoDetailsView(videoId: selectedVideoId??0),
+
         
             Spacer(),
           VerticalDivider(width: 1), // 섹션 구분선
