@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:admin/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:admin/searchtab.dart';
 
 
 class VideoDetailsView extends ConsumerWidget {
@@ -38,6 +39,7 @@ class VideoDetailsView extends ConsumerWidget {
         var youtubeId = YoutubePlayer.convertUrlToId(youtubeUrl);
         print(videoData['title']);
 
+
         return youtubeId != null
             ? Container(
   width: 600, // 원하는 너비
@@ -54,8 +56,12 @@ class VideoDetailsView extends ConsumerWidget {
     ),
     builder: (context, player) => Column(
       children: [
-        Text(videoData['title']),
+        Text(videoData['title'],
+        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
         player,
+        // SearchTab()
+        
+
         // 다른 필요한 데이터를 여기에 추가합니다.
       ],
     ),

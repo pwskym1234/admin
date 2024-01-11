@@ -1,5 +1,7 @@
 
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 class ApiService {
   final Dio _dio = Dio();
@@ -38,5 +40,21 @@ class ApiService {
       throw Exception('Error fetching video details: $e');
     }
   }
+    Future<List<dynamic>> fetchPanelList(int political_type) async {
+    try {
+      final response = await _dio.get(
+        'https://a-zit.tv/api/v1/panel/list',
+        queryParameters: {
+          'political_type': political_type,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Error fetching panel list: $e');
+    }
+  }
+
+
+
 }
 

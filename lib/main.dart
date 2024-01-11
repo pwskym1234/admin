@@ -45,7 +45,7 @@ class MyHomePage extends ConsumerWidget {
       body: Row( // Row 위젯 사용
         children: [
           if (selectedVideoId != null)
-          SizedBox(width: 300,), // 선택된 비디오 ID가 있을 때만 VideoDetailsView를 표시합니다.
+          SizedBox(width: 20,), 
             Container(
 
               child: VideoDetailsView(videoId: selectedVideoId??0),
