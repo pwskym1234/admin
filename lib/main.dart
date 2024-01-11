@@ -1,3 +1,4 @@
+import 'package:admin/searchtab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/videolistview.dart'; 
@@ -46,10 +47,14 @@ class MyHomePage extends ConsumerWidget {
         children: [
           if (selectedVideoId != null)
           SizedBox(width: 20,), 
-            Container(
+            
 
-              child: VideoDetailsView(videoId: selectedVideoId??0),
+            //  VideoDetailsView(videoId: selectedVideoId??0),
+            Container(
+              width: 500,
+              child: SearchTab(),
             ),
+        
             Spacer(),
           VerticalDivider(width: 1), // 섹션 구분선
           Container(
