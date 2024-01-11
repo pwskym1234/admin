@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/videolistview.dart'; 
+import 'package:admin/videodetailsview.dart';
+import 'package:admin/riverpod.dart';
 
 void main() {
   runApp(
@@ -26,22 +28,32 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends ConsumerWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // selectedVideoIdProvider에서 현재 선택된 videoId를 가져옵니다.
+    final selectedVideoId = ref.watch(selectedVideoIdProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
       body: Row( // Row 위젯 사용
         children: [
-          Spacer(), // 왼쪽 공간을 만들어주는 위젯
-          Expanded( // 오른쪽에 VideoListView를 배치
-            flex: 1, // 화면 공간 비율 조정 (필요에 따라 조절 가능)
+          if (selectedVideoId != null)
+          SizedBox(width: 300,), // 선택된 비디오 ID가 있을 때만 VideoDetailsView를 표시합니다.
+            Container(
+
+              child: VideoDetailsView(videoId: selectedVideoId??0),
+            ),
+            Spacer(),
+          VerticalDivider(width: 1), // 섹션 구분선
+          Container(
+            width: 300, // 고정된 너비 지정
             child: VideoListView(),
           ),
         ],
@@ -49,5 +61,3 @@ class MyHomePage extends StatelessWidget {
     );
   }
 }
-
-

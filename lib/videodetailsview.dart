@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:admin/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 
 class VideoDetailsView extends ConsumerWidget {
@@ -33,13 +34,34 @@ class VideoDetailsView extends ConsumerWidget {
         }
 
         var videoData = snapshot.data;
-        return Column(
-          children: [
-            Image.network(videoData['thumbnail_url']),
-            Text(videoData['title']),
-            // 다른 필요한 데이터를 여기에 추가합니다.
-          ],
-        );
+        var youtubeUrl = videoData['youtube_link'];
+        var youtubeId = YoutubePlayer.convertUrlToId(youtubeUrl);
+        print(videoData['title']);
+
+        return youtubeId != null
+            ? Container(
+  width: 600, // 원하는 너비
+
+  child: YoutubePlayerBuilder(
+    player: YoutubePlayer(
+      controller: YoutubePlayerController(
+        initialVideoId: youtubeId,
+        flags: YoutubePlayerFlags(
+          autoPlay: true,
+          mute: false,
+        ),
+      ),
+    ),
+    builder: (context, player) => Column(
+      children: [
+        Text(videoData['title']),
+        player,
+        // 다른 필요한 데이터를 여기에 추가합니다.
+      ],
+    ),
+  ),
+)
+            : Text('Invalid YouTube URL');
       },
     );
   }

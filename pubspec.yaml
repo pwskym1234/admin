@@ -30,15 +30,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  youtube_player_flutter: ^8.1.2
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
   dio: ^5.4.0 # 이곳에 원하는 dio 버전을 기입하세요
   flutter_riverpod: ^2.4.9 # 이곳에 원하는 flutter_riverpod 버전을 기입하세요
 
