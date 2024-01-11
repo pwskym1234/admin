@@ -1,12 +1,11 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 
 class ApiService {
   final Dio _dio = Dio();
 
-  Future<List<dynamic>> fetchVideoList(String type, int offset, int limit) async {
+  Future<List<dynamic>> fetchVideoList(
+      String type, int offset, int limit) async {
     try {
       final response = await _dio.get(
         'https://a-zit.tv/api/v1/video/list',
@@ -16,7 +15,7 @@ class ApiService {
           'limit': limit,
         },
       );
-      
+
       // print('API Response: ${response.data}');
 
       return response.data;
@@ -32,7 +31,7 @@ class ApiService {
       final response = await _dio.get(
         'https://a-zit.tv/api/v1/video',
         queryParameters: {
-          'video_id': videoId,
+          'id': videoId,
         },
       );
       return response.data;
@@ -40,7 +39,8 @@ class ApiService {
       throw Exception('Error fetching video details: $e');
     }
   }
-    Future<List<dynamic>> fetchPanelList(int political_type) async {
+
+  Future<List<dynamic>> fetchPanelList(int political_type) async {
     try {
       final response = await _dio.get(
         'https://a-zit.tv/api/v1/panel/list',
@@ -53,8 +53,4 @@ class ApiService {
       throw Exception('Error fetching panel list: $e');
     }
   }
-
-
-
 }
-

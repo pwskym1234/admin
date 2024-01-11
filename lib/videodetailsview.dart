@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:admin/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:admin/searchtab.dart';
-
 
 class VideoDetailsView extends ConsumerWidget {
   final int videoId;
@@ -15,15 +14,14 @@ class VideoDetailsView extends ConsumerWidget {
     final videoId = ref.watch(selectedVideoIdProvider);
 
     if (videoId == null) {
-      return Center(child: Text('Select a video'));
+      return const Center(child: Text('Select a video'));
     }
-
 
     return FutureBuilder(
       future: ref.read(apiServiceProvider).fetchVideoDetails(videoId),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         if (snapshot.hasError) {
@@ -31,46 +29,47 @@ class VideoDetailsView extends ConsumerWidget {
         }
 
         if (!snapshot.hasData) {
-          return Text('No data available');
+          return const Text('No data available');
         }
 
         var videoData = snapshot.data;
         var youtubeUrl = videoData['youtube_link'];
-        var youtubeId = YoutubePlayer.convertUrlToId(youtubeUrl);
-        print(videoData['title']);
+        final youtubeId = YoutubePlayerController.convertUrlToId(youtubeUrl);
 
+        if (youtubeId == null) {
+          return const Text('Invalid YouTube URL');
+        }
 
-        return youtubeId != null
-            ? Container(
-  width: 600, // 원하는 너비
-  height: 1000,
+        var controller = YoutubePlayerController(
+          initialVideoId: youtubeId,
+          params: YoutubePlayerParams(
+            showControls: true,
+            showFullscreenButton: true,
+            // 다른 YouTube IFrame 파라미터 추가
+          ),
+        );
 
-
-  child: YoutubePlayerBuilder(
-    player: YoutubePlayer(
-      controller: YoutubePlayerController(
-        initialVideoId: youtubeId,
-        flags: YoutubePlayerFlags(
-          autoPlay: true,
-          mute: false,
-        ),
-      ),
-    ),
-    builder: (context, player) => Column(
-      children: [
-        Text(videoData['title'],
-        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-        player,
-        SearchTab()
-        
-
-        // 다른 필요한 데이터를 여기에 추가합니다.
-      ],
-    ),
-  ),
-)
-
-            : Text('Invalid YouTube URL');
+        return YoutubePlayerControllerProvider(
+          controller: controller,
+          child: YoutubePlayerScaffold(
+            controller: controller,
+            builder: (context, player) => SizedBox(
+              width: 600, // 원하는 너비
+              child: Column(
+                children: [
+                  Text(
+                    videoData['title'],
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  player, // YoutubePlayerIFrame 대신 이렇게 사용
+                  SearchTab()
+                  // 여기에 다른 위젯 추가
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }

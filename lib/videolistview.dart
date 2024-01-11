@@ -30,7 +30,8 @@ class VideoListView extends ConsumerWidget {
               return ListTile(
                 title: Text(videoList[index]['title']),
                 onTap: () {
-                  ref.read(selectedVideoIdProvider.state).state = videoList[index]['id'];
+                  ref.read(selectedVideoIdProvider.notifier).state = videoList[index]['id'];
+                  print(videoList[index]['id']);
           
                   // 아이템 탭에 대한 액션을 여기에 추가하세요.
                 },

@@ -1,13 +1,13 @@
 import 'package:admin/searchtab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/videolistview.dart'; 
+import 'package:admin/videolistview.dart';
 import 'package:admin/videodetailsview.dart';
 import 'package:admin/riverpod.dart';
 
 void main() {
   runApp(
-    ProviderScope( 
+    ProviderScope(
       child: const MyApp(),
     ),
   );
@@ -43,16 +43,17 @@ class MyHomePage extends ConsumerWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Row( // Row 위젯 사용
+      body: Row(
+        // Row 위젯 사용
         children: [
           if (selectedVideoId != null)
-          SizedBox(width: 20,), 
-            
+            SizedBox(
+              width: 20,
+            ),
 
-             VideoDetailsView(videoId: selectedVideoId??0),
+          VideoDetailsView(videoId: selectedVideoId ?? 0),
 
-        
-            Spacer(),
+          Spacer(),
           VerticalDivider(width: 1), // 섹션 구분선
           Container(
             width: 300, // 고정된 너비 지정
