@@ -1,27 +1,99 @@
+import 'package:admin/tagsearchtab.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
-import 'package:admin/searchtab.dart';
+import 'package:admin/panelsearchtab.dart';
+import 'textbutton.dart'; // Import the custom TextButton
+import 'listview.dart';
 
-class VideoDetailsView extends ConsumerWidget {
+class VideoDetailsView extends ConsumerStatefulWidget {
   final int videoId;
 
   VideoDetailsView({required this.videoId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<VideoDetailsView> createState() => _VideoDetailsViewState();
+}
+
+class _VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
+  late Future<dynamic> videoDetailsFuture;
+  List<dynamic> panels = [];
+  List<dynamic> tags = [];
+  @override
+  void initState() {
+    super.initState();
+    videoDetailsFuture = fetchVideoDetails();
+  }
+
+  Future<dynamic> fetchVideoDetails() async {
+    var videoDetails =
+        await ref.read(apiServiceProvider).fetchVideoDetails(widget.videoId);
+
+    panels = videoDetails['panels'] != null
+        ? videoDetails['panels'] as List<dynamic>
+        : [];
+
+    panels = videoDetails['tags'] != null
+        ? videoDetails['tags'] as List<dynamic>
+        : [];
+
+    return videoDetails;
+  }
+
+  Future<void> addPanel(int panelId, String panelName) async {
+    await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
+    setState(() {
+      var newPanel = {
+        'id': panelId,
+        'name': panelName,
+      };
+      panels.add(newPanel);
+    });
+  }
+
+  Future<void> removePanel(int panelId) async {
+    await ref
+        .read(apiServiceProvider)
+        .removePanelFromVideo(widget.videoId, panelId);
+    setState(() {
+      panels.removeWhere((panel) => panel['id'] == panelId);
+    });
+  }
+
+  Future<void> addTag(int tagId, String tagName) async {
+    await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
+    setState(() {
+      var newTag = {
+        'id': tagId,
+        'name': tagName,
+      };
+      tags.add(newTag);
+    });
+  }
+
+  Future<void> removeTag(int tagId) async {
+    await ref
+        .read(apiServiceProvider)
+        .removeTagFromVideo(widget.videoId, tagId);
+    setState(() {
+      tags.removeWhere((tag) => tag['id'] == tagId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final videoId = ref.watch(selectedVideoIdProvider);
 
     if (videoId == null) {
-      return Center(child: Text('Select a video'));
+      return const Center(child: Text('Select a video'));
     }
 
     return FutureBuilder(
       future: ref.read(apiServiceProvider).fetchVideoDetails(videoId),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         if (snapshot.hasError) {
@@ -29,11 +101,12 @@ class VideoDetailsView extends ConsumerWidget {
         }
 
         if (!snapshot.hasData) {
-          return Text('No data available');
+          return const Text('No data available');
         }
 
         var videoData = snapshot.data;
         var panels = videoData['panels'] as List<dynamic>;
+        var tags = videoData['tags'] as List<dynamic>;
 
         var youtubeUrl = videoData['youtube_link'];
         final youtubeId = YoutubePlayerController.convertUrlToId(youtubeUrl);
@@ -48,50 +121,145 @@ class VideoDetailsView extends ConsumerWidget {
           params: const YoutubePlayerParams(showFullscreenButton: true),
         );
 
-        return SizedBox(
-            width: 600, // 원하는 너비
-
-            child: YoutubePlayerControllerProvider(
-              controller: _controller,
-              child: Builder(
-                builder: (context) => Column(
+        return YoutubePlayerControllerProvider(
+          controller: _controller,
+          child: Builder(
+            builder: (context) => Column(
+              children: [
+                Text(
+                  videoData['title'],
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Row(
                   children: [
-                    Text(
-                      videoData['title'],
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    SizedBox(
+                      width: 600,
+                      child: YoutubePlayer(
+                        controller: _controller,
+                        aspectRatio: 16 / 9,
+                      ),
                     ),
-                    YoutubePlayer(
-                      controller: _controller,
-                      aspectRatio: 16 / 9,
+                    Expanded(
+                      child: SizedBox(
+                        height: 330,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: panels.length,
+                                itemBuilder: (context, index) {
+                                  final panel = panels[index];
+                                  return ListTile(
+                                    title: Text(panel['name']),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () => removePanel(panel['id']),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const Divider(),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: tags.length,
+                                itemBuilder: (context, index) {
+                                  final tag = tags[index];
+                                  return ListTile(
+                                    title: Text(tag['name']),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () => removeTag(tag['id']),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    SearchTab(),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: panels.length,
-                      itemBuilder: (context, index) {
-                        final panel = panels[index];
-                        return ListTile(
-                          title: Text(panel['name']),
-                          trailing: IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () async {
-                              await ref
-                                  .read(apiServiceProvider)
-                                  .removePanelFromVideo(videoId, panel['id']);
-                              // UI 업데이트를 위해 필요한 로직을 추가합니다.
-                              // 예: 상태 업데이트 또는 새로운 데이터로 FutureBuilder를 다시 빌드합니다.
-                            },
-                          ),
-                        );
-                      },
-                    ),
-
-                    // 다른 필요한 데이터를 여기에 추가합니다.
                   ],
                 ),
-              ),
-            ));
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: PanelSearchTab()),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 35), // 상단에만 패딩 적용
+                      child: TextButton(
+                        onPressed: () async {
+                          // async 키워드 추가
+                          final searchQuery =
+                              ref.read(searchPanelQueryProvider.notifier).state;
+                          final panelListAsyncValue =
+                              ref.watch(panelListProvider);
+
+                          await panelListAsyncValue.whenData((panelList) async {
+                            final matchingPanel = panelList.firstWhere(
+                              (panel) =>
+                                  panel['name'].toString() == searchQuery,
+                              orElse: () => null,
+                            );
+                            final videoId = ref.watch(selectedVideoIdProvider);
+
+                            if (matchingPanel != null && videoId != null) {
+                              await addPanel(
+                                  matchingPanel['id'], matchingPanel['name']);
+                            }
+                          });
+                        },
+                        child: const Text(
+                          '추가',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.black,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: TagSearchTab()),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 35),
+                      child: TextButton(
+                        onPressed: () async {
+                          // async 키워드 추가
+                          final searchQuery =
+                              ref.read(searchTagQueryProvider.notifier).state;
+                          final tagListAsyncValue = ref.watch(tagListProvider);
+
+                          await tagListAsyncValue.whenData((tagList) async {
+                            final matchingTag = tagList.firstWhere(
+                              (tag) => tag['name'].toString() == searchQuery,
+                              orElse: () => null,
+                            );
+                            final videoId = ref.watch(selectedVideoIdProvider);
+
+                            if (matchingTag != null && videoId != null) {
+                              await addTag(
+                                  matchingTag['id'], matchingTag['name']);
+                            }
+                          });
+                        },
+                        child: const Text(
+                          '추가',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // 다른 필요한 데이터를 여기에 추가합니다.
+              ],
+            ),
+          ),
+        );
       },
     );
   }

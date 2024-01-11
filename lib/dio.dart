@@ -88,4 +88,51 @@ class ApiService {
       throw Exception('Exception occurred while removing panel: $e');
     }
   }
+
+  Future<List<dynamic>> fetchTagList() async {
+    try {
+      final response = await _dio.get(
+        'https://a-zit.tv/api/v1/tag/list',
+        queryParameters: {},
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Error fetching tag list: $e');
+    }
+  }
+
+  Future<void> addTagToVideo(int videoId, int tagId) async {
+    final response =
+        await _dio.post('https://a-zit.tv/api/v1/video/tag/create', data: {
+      'video': videoId,
+      'tag': tagId,
+    });
+
+    if (response.statusCode == 200) {
+      print('Tag added successfully');
+    } else {
+      print('Failed to add tag');
+    }
+  }
+
+  Future<void> removeTagFromVideo(int videoId, int tagId) async {
+    try {
+      final response = await _dio.post(
+        'https://a-zit.tv/api/v1/video/tag/delete',
+        data: {
+          'video': videoId,
+          'tag': tagId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Tag successfully removed');
+      } else {
+        print('Failed to remove tag');
+      }
+    } catch (e) {
+      print('Exception occurred while removing tag: $e');
+      throw Exception('Exception occurred while removing tag: $e');
+    }
+  }
 }
