@@ -36,7 +36,13 @@ final panelListProvider = FutureProvider<List<dynamic>>((ref) async {
   final apiService = ref.read(apiServiceProvider); // ApiService 인스턴스 가져오기
 
   try {
-    final panelList = await apiService.fetchPanelList(1);
+    final responses = await Future.wait([
+      apiService.fetchPanelList(1),
+      apiService.fetchPanelList(2),
+      apiService.fetchPanelList(3),
+    ]);
+
+    final panelList = responses.expand((x) => x).toList();
 
     if (searchQuery != null && searchQuery.isNotEmpty) {
       // 검색어를 사용하여 필터링

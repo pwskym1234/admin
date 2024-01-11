@@ -99,8 +99,12 @@ class PanelSearchTab extends ConsumerWidget {
   Future<List<dynamic>> _fetchAndFilterPanelList(WidgetRef ref) async {
     final searchQuery = ref.read(searchPanelQueryProvider.notifier).state ?? "";
     final apiService = ref.read(apiServiceProvider);
-    final panelList =
-        await apiService.fetchPanelList(1); // 'political_type' 실제 값으로 변경 필요
+    final responses = await Future.wait([
+      apiService.fetchPanelList(1),
+      apiService.fetchPanelList(2),
+      apiService.fetchPanelList(3),
+    ]);
+    final panelList = responses.expand((x) => x).toList();
 
     return searchQuery.isNotEmpty
         ? panelList
