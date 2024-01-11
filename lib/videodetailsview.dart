@@ -10,6 +10,13 @@ class VideoDetailsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final videoId = ref.watch(selectedVideoIdProvider);
+
+    if (videoId == null) {
+      return Center(child: Text('Select a video'));
+    }
+
+
     return FutureBuilder(
       future: ref.read(apiServiceProvider).fetchVideoDetails(videoId),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {

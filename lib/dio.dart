@@ -14,8 +14,13 @@ class ApiService {
           'limit': limit,
         },
       );
+      
+      // print('API Response: ${response.data}');
+
       return response.data;
     } catch (e) {
+      // 로깅: 예외 발생 시 출력
+      print('Error fetching video list: $e');
       throw Exception('Error fetching video list: $e');
     }
   }
