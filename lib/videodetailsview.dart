@@ -4,8 +4,8 @@ import 'package:admin/riverpod.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:admin/panelsearchtab.dart';
-import 'textbutton.dart'; // Import the custom TextButton
-import 'listview.dart';
+import 'package:admin/listitemview.dart';
+import 'package:admin/searchtabwithbutton.dart';
 
 class VideoDetailsView extends ConsumerStatefulWidget {
   final int videoId;
@@ -13,10 +13,10 @@ class VideoDetailsView extends ConsumerStatefulWidget {
   VideoDetailsView({required this.videoId});
 
   @override
-  ConsumerState<VideoDetailsView> createState() => _VideoDetailsViewState();
+  ConsumerState<VideoDetailsView> createState() => VideoDetailsViewState();
 }
 
-class _VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
+class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
   late Future<dynamic> videoDetailsFuture;
   List<dynamic> panels = [];
   List<dynamic> tags = [];
@@ -146,34 +146,16 @@ class _VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                         child: Column(
                           children: [
                             Expanded(
-                              child: ListView.builder(
-                                itemCount: panels.length,
-                                itemBuilder: (context, index) {
-                                  final panel = panels[index];
-                                  return ListTile(
-                                    title: Text(panel['name']),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () => removePanel(panel['id']),
-                                    ),
-                                  );
-                                },
+                              child: ListItemView(
+                                items: panels,
+                                onRemove: (id) => removePanel(id),
                               ),
                             ),
                             const Divider(),
                             Expanded(
-                              child: ListView.builder(
-                                itemCount: tags.length,
-                                itemBuilder: (context, index) {
-                                  final tag = tags[index];
-                                  return ListTile(
-                                    title: Text(tag['name']),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () => removeTag(tag['id']),
-                                    ),
-                                  );
-                                },
+                              child: ListItemView(
+                                items: tags,
+                                onRemove: (id) => removeTag(id),
                               ),
                             ),
                           ],
@@ -223,7 +205,7 @@ class _VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                     ),
                     Expanded(child: TagSearchTab()),
                     Padding(
-                      padding: const EdgeInsets.only(top: 35),
+                      padding: const EdgeInsets.fromLTRB(0, 35, 10, 0),
                       child: TextButton(
                         onPressed: () async {
                           // async 키워드 추가

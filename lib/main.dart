@@ -1,7 +1,7 @@
-import 'package:admin/panelsearchtab.dart';
+import 'package:admin/untaggedvideolistview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/videolistview.dart';
+import 'package:admin/livevideolistview.dart';
 import 'package:admin/videodetailsview.dart';
 import 'package:admin/riverpod.dart';
 
@@ -39,25 +39,48 @@ class MyHomePage extends ConsumerWidget {
     // selectedVideoIdProvider에서 현재 선택된 videoId를 가져옵니다.
     final selectedVideoId = ref.watch(selectedVideoIdProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Row(
-        // Row 위젯 사용
-        children: [
-          if (selectedVideoId != null) SizedBox(width: 20),
+    return DefaultTabController(
+      length: 2, // 탭의 개수
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Row(
+          children: [
+            if (selectedVideoId != null) SizedBox(width: 20),
 
-          Expanded(
-            child: VideoDetailsView(videoId: selectedVideoId ?? 0),
-          ),
+            Expanded(
+              child: VideoDetailsView(videoId: selectedVideoId ?? 0),
+            ),
 
-          VerticalDivider(width: 1), // 섹션 구분선
-          Container(
-            width: 300, // 고정된 너비 지정
-            child: VideoListView(),
-          ),
-        ],
+            VerticalDivider(width: 1), // 섹션 구분선
+
+            // TabBar를 포함하는 Container
+            Container(
+              width: 300, // 고정된 너비 지정
+              child: Column(
+                children: [
+                  // TabBar 정의
+                  TabBar(
+                    tabs: [
+                      Tab(text: '라이브 영상 리스트'),
+                      Tab(text: '태그가 필요한 영상 리스트'),
+                    ],
+                  ),
+                  Expanded(
+                    // TabBarView 정의
+                    child: TabBarView(
+                      children: [
+                        LiveVideoListView(), // 첫 번째 탭의 내용
+                        UntaggedVideoListView(), // 두 번째 탭의 내용 (빈 공간)
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -23,6 +23,30 @@ class VideoListNotifier extends StateNotifier<List<dynamic>> {
   }
 }
 
+final untaggedVideoListProvider =
+    StateNotifierProvider<UntaggedVideoListNotifier, List<dynamic>>((ref) {
+  return UntaggedVideoListNotifier(ref);
+});
+
+class UntaggedVideoListNotifier extends StateNotifier<List<dynamic>> {
+  UntaggedVideoListNotifier(this.ref) : super([]);
+
+  final Ref ref;
+  ApiService get _apiService => ref.read(apiServiceProvider);
+
+  Future<void> getUntaggedVideos(
+      String type, String tag_added, int offset, int limit) async {
+    try {
+      final videos = await _apiService.fetchUntaggedVideoList(
+          type, tag_added, offset, limit);
+      state = videos;
+    } catch (e) {
+      print("API 호출 중 오류가 발생했습니다: $e");
+      state = [];
+    }
+  }
+}
+
 final apiServiceProvider = Provider<ApiService>((ref) {
   return ApiService();
 });

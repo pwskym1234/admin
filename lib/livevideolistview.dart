@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/riverpod.dart';
 
-class VideoListView extends ConsumerWidget {
+class LiveVideoListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final videoListNotifier = ref.read(videoListProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      videoListNotifier.getVideos('LIVE', 0, 10);
+      videoListNotifier.getVideos('LIVE', 0, 30);
     });
 
     final videoList = ref.watch(videoListProvider);
