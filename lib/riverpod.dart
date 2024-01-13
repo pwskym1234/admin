@@ -86,13 +86,12 @@ final searchTagQueryProvider = StateProvider<String?>((ref) => null);
 
 final tagListProvider = FutureProvider<List<dynamic>>((ref) async {
   final searchQuery = ref.watch(searchTagQueryProvider);
-  final apiService = ref.read(apiServiceProvider); // ApiService 인스턴스 가져오기
+  final apiService = ref.read(apiServiceProvider);
 
   try {
     final tagList = await apiService.fetchTagList();
 
     if (searchQuery != null && searchQuery.isNotEmpty) {
-      // 검색어를 사용하여 필터링
       return tagList
           .where((tagData) => tagData['name'].toString().contains(searchQuery))
           .toList();

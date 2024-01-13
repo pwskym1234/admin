@@ -157,4 +157,44 @@ class ApiService {
       throw Exception('Exception occurred while removing tag: $e');
     }
   }
+
+  Future<dynamic> createTag(String tagName) async {
+    try {
+      final response = await _dio.post(
+        'https://a-zit.tv/api/v1/tag/create',
+        data: {'name': tagName},
+      );
+
+      if (response.statusCode == 201) {
+        print('Tag created successfully: ${response.data}');
+        return response.data;
+      } else {
+        print('Failed to create tag');
+        throw Exception('Failed to create tag');
+      }
+    } catch (e) {
+      print('Exception occurred while creating tag: $e');
+      throw Exception('Exception occurred while creating tag: $e');
+    }
+  }
+
+  Future<dynamic> createPanel(String panelName) async {
+    try {
+      final response = await _dio.post(
+        'https://a-zit.tv/api/v1/panel/create',
+        data: {'name': panelName},
+      );
+
+      if (response.statusCode == 201) {
+        print('Tag created successfully: ${response.data}');
+        return response.data;
+      } else {
+        print('Failed to create tag');
+        throw Exception('Failed to create tag');
+      }
+    } catch (e) {
+      print('Exception occurred while creating tag: $e');
+      throw Exception('Exception occurred while creating tag: $e');
+    }
+  }
 }

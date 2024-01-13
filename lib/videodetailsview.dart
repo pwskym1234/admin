@@ -41,15 +41,50 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
     return videoDetails;
   }
 
-  Future<void> addPanel(int panelId, String panelName) async {
-    await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
-    setState(() {
-      var newPanel = {
-        'id': panelId,
-        'name': panelName,
-      };
-      panels.add(newPanel);
-    });
+  // Future<void> addPanel(int panelId, String panelName) async {
+  //   await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
+  //   setState(() {
+  //     var newPanel = {
+  //       'id': panelId,
+  //       'name': panelName,
+  //     };
+  //     panels.add(newPanel);
+  //   });
+  // }
+
+  Future<void> addPanel(String panelName) async {
+    try {
+      final panelListAsyncValue = ref.watch(panelListProvider);
+
+      bool panelExists = false;
+      await panelListAsyncValue.whenData((panelList) {
+        panelExists = panelList.any((panel) => panel['name'] == panelName);
+      });
+
+      int panelId;
+      if (!panelExists) {
+        var newPanel =
+            await ref.read(apiServiceProvider).createPanel(panelName);
+        panelId = newPanel['id'];
+      } else {
+        panelId = panelListAsyncValue.value!.firstWhere(
+          (panel) => panel['name'] == panelName,
+          orElse: () => throw Exception('Panel not found'),
+        )['id'];
+      }
+
+      await ref
+          .read(apiServiceProvider)
+          .addPanelToVideo(widget.videoId, panelId);
+      setState(() {
+        tags.add({
+          'id': panelId,
+          'name': panelName,
+        });
+      });
+    } catch (e) {
+      print('Error adding tag: $e');
+    }
   }
 
   Future<void> removePanel(int panelId) async {
@@ -61,15 +96,47 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
     });
   }
 
-  Future<void> addTag(int tagId, String tagName) async {
-    await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
-    setState(() {
-      var newTag = {
-        'id': tagId,
-        'name': tagName,
-      };
-      tags.add(newTag);
-    });
+  // Future<void> addTag(int tagId, String tagName) async {
+  //   await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
+  //   setState(() {
+  //     var newTag = {
+  //       'id': tagId,
+  //       'name': tagName,
+  //     };
+  //     tags.add(newTag);
+  //   });
+  // }
+
+  Future<void> addTag(String tagName) async {
+    try {
+      final tagListAsyncValue = ref.watch(tagListProvider);
+
+      bool tagExists = false;
+      await tagListAsyncValue.whenData((tagList) {
+        tagExists = tagList.any((tag) => tag['name'] == tagName);
+      });
+
+      int tagId;
+      if (!tagExists) {
+        var newTag = await ref.read(apiServiceProvider).createTag(tagName);
+        tagId = newTag['id'];
+      } else {
+        tagId = tagListAsyncValue.value!.firstWhere(
+          (tag) => tag['name'] == tagName,
+          orElse: () => throw Exception('Tag not found'),
+        )['id'];
+      }
+
+      await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
+      setState(() {
+        tags.add({
+          'id': tagId,
+          'name': tagName,
+        });
+      });
+    } catch (e) {
+      print('Error adding tag: $e');
+    }
   }
 
   Future<void> removeTag(int tagId) async {
@@ -174,25 +241,16 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                       padding: const EdgeInsets.only(top: 35), // 상단에만 패딩 적용
                       child: TextButton(
                         onPressed: () async {
-                          // async 키워드 추가
                           final searchQuery =
                               ref.read(searchPanelQueryProvider.notifier).state;
-                          final panelListAsyncValue =
-                              ref.watch(panelListProvider);
 
-                          await panelListAsyncValue.whenData((panelList) async {
-                            final matchingPanel = panelList.firstWhere(
-                              (panel) =>
-                                  panel['name'].toString() == searchQuery,
-                              orElse: () => null,
-                            );
+                          if (searchQuery != null && searchQuery.isNotEmpty) {
                             final videoId = ref.watch(selectedVideoIdProvider);
 
-                            if (matchingPanel != null && videoId != null) {
-                              await addPanel(
-                                  matchingPanel['id'], matchingPanel['name']);
+                            if (videoId != null) {
+                              await addPanel(searchQuery);
                             }
-                          });
+                          }
                         },
                         child: const Text(
                           '추가',
@@ -208,23 +266,16 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                       padding: const EdgeInsets.fromLTRB(0, 35, 10, 0),
                       child: TextButton(
                         onPressed: () async {
-                          // async 키워드 추가
                           final searchQuery =
                               ref.read(searchTagQueryProvider.notifier).state;
-                          final tagListAsyncValue = ref.watch(tagListProvider);
 
-                          await tagListAsyncValue.whenData((tagList) async {
-                            final matchingTag = tagList.firstWhere(
-                              (tag) => tag['name'].toString() == searchQuery,
-                              orElse: () => null,
-                            );
+                          if (searchQuery != null && searchQuery.isNotEmpty) {
                             final videoId = ref.watch(selectedVideoIdProvider);
 
-                            if (matchingTag != null && videoId != null) {
-                              await addTag(
-                                  matchingTag['id'], matchingTag['name']);
+                            if (videoId != null) {
+                              await addTag(searchQuery);
                             }
-                          });
+                          }
                         },
                         child: const Text(
                           '추가',

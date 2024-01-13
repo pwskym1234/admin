@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/livevideolistview.dart';
 import 'package:admin/videodetailsview.dart';
 import 'package:admin/riverpod.dart';
+import 'package:admin/creatpage.dart';
 
 void main() {
   runApp(
@@ -33,6 +34,12 @@ class MyHomePage extends ConsumerWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  // void _navigateToEmptyPage(BuildContext context) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(builder: (context) => EmptyPage()),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
