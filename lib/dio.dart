@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'dart:io';
 
 class ApiService {
   final Dio _dio = Dio();
@@ -179,17 +178,19 @@ class ApiService {
     }
   }
 
-  Future<dynamic> createPanel(
-      String panelName, File thumbnailUrl, int categoryId) async {
+  Future<dynamic> createPanel(String panelName, int categoryId,
+      List<int>? imageByte, String? fileName) async {
     try {
-      final response = await _dio.post(
-        'https://a-zit.tv/api/v1/panel/create',
-        data: {
-          'name': panelName,
-          'thumbnal_url': thumbnailUrl,
-          'category': categoryId
-        },
-      );
+      Map<String, dynamic> data = {
+        'name': panelName,
+        'category': categoryId,
+      };
+      if (imageByte != null && fileName != null) {
+        data.putIfAbsent('thumbnail_url',
+            () => MultipartFile.fromBytes(imageByte, filename: fileName));
+      }
+      final response = await _dio.post('https://a-zit.tv/api/v1/panel/create',
+          data: FormData.fromMap(data));
 
       if (response.statusCode == 201) {
         print('Tag created successfully: ${response.data}');

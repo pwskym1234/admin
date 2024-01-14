@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:admin/panelsearchtab.dart';
 import 'package:admin/listitemview.dart';
-import 'package:admin/searchtabwithbutton.dart';
+import 'package:admin/custombutton.dart';
 
 class VideoDetailsView extends ConsumerStatefulWidget {
   final int videoId;
@@ -60,17 +60,6 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
       panels.removeWhere((panel) => panel['id'] == panelId);
     });
   }
-
-  // Future<void> addTag(int tagId, String tagName) async {
-  //   await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
-  //   setState(() {
-  //     var newTag = {
-  //       'id': tagId,
-  //       'name': tagName,
-  //     };
-  //     tags.add(newTag);
-  //   });
-  // }
 
   Future<void> addTag(String tagName) async {
     try {
@@ -196,79 +185,59 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                     ),
                   ],
                 ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: PanelSearchTab()),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 35),
-                      child: TextButton(
-                        onPressed: () async {
-                          final searchQuery =
-                              ref.read(searchPanelQueryProvider.notifier).state;
+                    CustomButton(
+                      text: '추가',
+                      onPressed: () async {
+                        final searchQuery =
+                            ref.read(searchPanelQueryProvider.notifier).state;
 
-                          if (searchQuery != null && searchQuery.isNotEmpty) {
-                            final videoId = ref.watch(selectedVideoIdProvider);
+                        if (searchQuery != null && searchQuery.isNotEmpty) {
+                          final videoId = ref.watch(selectedVideoIdProvider);
 
-                            if (videoId != null) {
-                              final panelListAsyncValue =
-                                  ref.watch(panelListProvider);
+                          if (videoId != null) {
+                            final panelListAsyncValue =
+                                ref.watch(panelListProvider);
 
-                              await panelListAsyncValue
-                                  .whenData((panelList) async {
-                                final matchingPanel = panelList.firstWhere(
-                                  (panel) =>
-                                      panel['name'].toString() == searchQuery,
-                                  orElse: () => null,
-                                );
+                            await panelListAsyncValue
+                                .whenData((panelList) async {
+                              final matchingPanel = panelList.firstWhere(
+                                (panel) =>
+                                    panel['name'].toString() == searchQuery,
+                                orElse: () => null,
+                              );
 
-                                if (matchingPanel != null) {
-                                  await addPanel(matchingPanel['id'],
-                                      matchingPanel['name']);
-                                } else {}
-                              });
-                            }
+                              if (matchingPanel != null) {
+                                await addPanel(
+                                    matchingPanel['id'], matchingPanel['name']);
+                              } else {}
+                            });
                           }
-                        },
-                        child: const Text(
-                          '추가',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.black,
-                        ),
-                      ),
+                        }
+                      },
                     ),
                     Expanded(child: TagSearchTab()),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 35, 10, 0),
-                      child: TextButton(
-                        onPressed: () async {
-                          final searchQuery =
-                              ref.read(searchTagQueryProvider.notifier).state;
+                    CustomButton(
+                      text: '추가',
+                      onPressed: () async {
+                        final searchQuery =
+                            ref.read(searchTagQueryProvider.notifier).state;
 
-                          if (searchQuery != null && searchQuery.isNotEmpty) {
-                            final videoId = ref.watch(selectedVideoIdProvider);
+                        if (searchQuery != null && searchQuery.isNotEmpty) {
+                          final videoId = ref.watch(selectedVideoIdProvider);
 
-                            if (videoId != null) {
-                              await addTag(searchQuery);
-                            }
+                          if (videoId != null) {
+                            await addTag(searchQuery);
                           }
-                        },
-                        child: const Text(
-                          '추가',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.black,
-                        ),
-                      ),
+                        }
+                      },
                     ),
                   ],
                 ),
-                // 다른 필요한 데이터를 여기에 추가합니다.
               ],
             ),
           ),
