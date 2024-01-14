@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/riverpod.dart';
+import 'package:admin/feature/home/logic/home_controller.dart';
 
-class LiveVideoListView extends ConsumerWidget {
+class UntaggedVideoList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final videoListNotifier = ref.read(videoListProvider.notifier);
+    final untaggedVideoListNotifier =
+        ref.read(untaggedVideoListProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      videoListNotifier.getVideos('LIVE', 0, 30);
+      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 10);
     });
 
-    final videoList = ref.watch(videoListProvider);
+    final videoList = ref.watch(untaggedVideoListProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            '라이브 영상 리스트', // 여기에 원하는 제목을 입력하세요.
+            '태그가 필요한 영상 리스트', // 여기에 원하는 제목을 입력하세요.
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
@@ -26,27 +27,8 @@ class LiveVideoListView extends ConsumerWidget {
             itemCount: videoList.length,
             itemBuilder: (context, index) {
               final item = videoList[index];
-              Color circleColor;
-
-              // 여기에서 동그라미의 색을 결정합니다.
-              bool panelsEmpty =
-                  item['panels'] == null || item['panels'].isEmpty;
-              bool tagsEmpty = item['tags'] == null || item['tags'].isEmpty;
-
-              if (panelsEmpty && tagsEmpty) {
-                circleColor = Colors.red;
-              } else if (panelsEmpty || tagsEmpty) {
-                circleColor = Colors.yellow;
-              } else {
-                circleColor = Colors.green;
-              }
-
               return ListTile(
                 title: Text(item['title']),
-                trailing: CircleAvatar(
-                  backgroundColor: circleColor,
-                  radius: 7, // 원하는 크기로 조절하세요.
-                ),
                 onTap: () {
                   ref.read(selectedVideoIdProvider.notifier).state = item['id'];
                   print(item['id']);

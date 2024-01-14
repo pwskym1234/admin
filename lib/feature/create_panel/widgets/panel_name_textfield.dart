@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class PanelNameInput extends StatelessWidget {
+class PanelNameTextField extends StatelessWidget {
   final TextEditingController controller;
 
-  PanelNameInput({required this.controller});
+  PanelNameTextField({required this.controller});
 
   @override
   Widget build(BuildContext context) {

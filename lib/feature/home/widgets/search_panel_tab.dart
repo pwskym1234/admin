@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/riverpod.dart';
+import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/data/apiservice.dart';
 
-class PanelSearchTab extends ConsumerWidget {
+class SearchPanelTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(

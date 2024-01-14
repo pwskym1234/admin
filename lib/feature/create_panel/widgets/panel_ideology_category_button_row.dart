@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CategorySelection extends StatelessWidget {
+class PanelIdeologyCategoryButtonRow extends StatelessWidget {
   final int? selectedCategoryId;
   final Function(int) onSelectCategory;
 
-  CategorySelection({
+  PanelIdeologyCategoryButtonRow({
     required this.selectedCategoryId,
     required this.onSelectCategory,
   });

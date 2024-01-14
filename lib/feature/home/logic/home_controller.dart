@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/dio.dart';
+import 'package:admin/data/apiservice.dart';
 
 final videoListProvider =
     StateNotifierProvider<VideoListNotifier, List<dynamic>>((ref) {
@@ -46,10 +46,6 @@ class UntaggedVideoListNotifier extends StateNotifier<List<dynamic>> {
     }
   }
 }
-
-final apiServiceProvider = Provider<ApiService>((ref) {
-  return ApiService();
-});
 
 final selectedVideoIdProvider = StateProvider<int?>((ref) => null);
 
@@ -102,28 +98,3 @@ final tagListProvider = FutureProvider<List<dynamic>>((ref) async {
     throw Exception('태그 목록 불러오기 실패: $e');
   }
 });
-
-final selectedCategoryIdProvider = StateProvider<int?>((ref) => null);
-
-
-
-
-
-// final panelListProvider = FutureProvider<List<dynamic>>((ref) async {
-//   final searchQuery = ref.watch(searchQueryProvider);
-  
-//   if (response.statusCode == 200) {
-//     final panelDataList = List<dynamic>.from(response.data);
-//     if (searchQuery != null && searchQuery.isNotEmpty) {
-//       // 검색어를 사용하여 필터링
-//       return panelDataList
-//           .where((panelData) =>
-//               panelData['name'].toString().contains(searchQuery))
-//           .toList();
-//     } else {
-//       return panelDataList;
-//     }
-//   } else {
-//     throw Exception('Failed to load panel list');
-//   }
-// });

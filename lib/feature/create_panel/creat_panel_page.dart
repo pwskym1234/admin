@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/riverpod.dart';
+import 'package:admin/feature/create_panel/logic/create_panel_controller.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:admin/dio.dart';
-import 'package:admin/categoryselection.dart';
-import 'package:admin/createpanelbutton.dart';
-import 'package:admin/panelnameinput.dart';
-import 'package:admin/thumbnailselector.dart';
+import 'package:admin/data/apiservice.dart';
+import 'package:admin/feature/create_panel/widgets/panel_ideology_category_button_row.dart';
+import 'package:admin/feature/create_panel/widgets/create_panel_button.dart';
+import 'package:admin/feature/create_panel/widgets/panel_name_textfield.dart';
+import 'package:admin/feature/create_panel/widgets/panel_thumbnail_button.dart';
 
 class EmptyPage extends ConsumerStatefulWidget {
   @override
@@ -82,9 +82,9 @@ class _EmptyPageState extends ConsumerState<EmptyPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                PanelNameInput(controller: panelNameController),
+                PanelNameTextField(controller: panelNameController),
                 SizedBox(height: 24),
-                ThumbnailSelector(
+                PanelThumbnailButton(
                   imageName: imageName,
                   onSelectThumbnail: selectThumbnail,
                   onCancelThumbnail: () {
@@ -95,7 +95,7 @@ class _EmptyPageState extends ConsumerState<EmptyPage> {
                   },
                 ),
                 SizedBox(height: 24),
-                CategorySelection(
+                PanelIdeologyCategoryButtonRow(
                   selectedCategoryId: selectedCategoryId,
                   onSelectCategory: selectCategory,
                 ),

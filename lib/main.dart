@@ -1,10 +1,10 @@
-import 'package:admin/untaggedvideolistview.dart';
+import 'package:admin/feature/home/widgets/untagged_video_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/livevideolistview.dart';
-import 'package:admin/videodetailsview.dart';
-import 'package:admin/riverpod.dart';
-import 'package:admin/creatpage.dart';
+import 'package:admin/feature/home/widgets/live_video_list.dart';
+import 'package:admin/feature/home/selected_video_details.dart';
+import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/feature/create_panel/creat_panel_page.dart';
 
 void main() {
   runApp(
@@ -73,7 +73,7 @@ class MyHomePage extends ConsumerWidget {
             if (selectedVideoId != null) SizedBox(width: 20),
 
             Expanded(
-              child: VideoDetailsView(videoId: selectedVideoId ?? 0),
+              child: SelectedVideoDetails(videoId: selectedVideoId ?? 0),
             ),
 
             VerticalDivider(width: 1), // 섹션 구분선
@@ -94,8 +94,8 @@ class MyHomePage extends ConsumerWidget {
                     // TabBarView 정의
                     child: TabBarView(
                       children: [
-                        LiveVideoListView(), // 첫 번째 탭의 내용
-                        UntaggedVideoListView(), // 두 번째 탭의 내용 (빈 공간)
+                        LiveVideoList(), // 첫 번째 탭의 내용
+                        UntaggedVideoList(), // 두 번째 탭의 내용 (빈 공간)
                       ],
                     ),
                   ),

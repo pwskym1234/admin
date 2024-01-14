@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ListItemView extends StatelessWidget {
+class SelectedItemCustomList extends StatelessWidget {
   final List<dynamic> items;
   final Function(int id) onRemove;
 
-  const ListItemView({
+  const SelectedItemCustomList({
     Key? key,
     required this.items,
     required this.onRemove,

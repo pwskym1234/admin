@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ThumbnailSelector extends StatelessWidget {
+class PanelThumbnailButton extends StatelessWidget {
   final String? imageName;
   final VoidCallback onSelectThumbnail;
   final VoidCallback onCancelThumbnail;
 
-  ThumbnailSelector({
+  PanelThumbnailButton({
     required this.imageName,
     required this.onSelectThumbnail,
     required this.onCancelThumbnail,

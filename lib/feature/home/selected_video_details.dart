@@ -1,22 +1,24 @@
-import 'package:admin/tagsearchtab.dart';
+import 'package:admin/feature/home/widgets/search_tag_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/riverpod.dart';
+import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/data/apiservice.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
-import 'package:admin/panelsearchtab.dart';
-import 'package:admin/listitemview.dart';
-import 'package:admin/custombutton.dart';
+import 'package:admin/feature/home/widgets/search_panel_tab.dart';
+import 'package:admin/feature/home/widgets/selected_items_custom_list.dart';
+import 'package:admin/feature/home/widgets/edit_custom_button.dart';
 
-class VideoDetailsView extends ConsumerStatefulWidget {
+class SelectedVideoDetails extends ConsumerStatefulWidget {
   final int videoId;
 
-  VideoDetailsView({required this.videoId});
+  SelectedVideoDetails({required this.videoId});
 
   @override
-  ConsumerState<VideoDetailsView> createState() => VideoDetailsViewState();
+  ConsumerState<SelectedVideoDetails> createState() =>
+      SelectedVideoDetailsState();
 }
 
-class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
+class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
   late Future<dynamic> videoDetailsFuture;
   List<dynamic> panels = [];
   List<dynamic> tags = [];
@@ -167,14 +169,14 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                         child: Column(
                           children: [
                             Expanded(
-                              child: ListItemView(
+                              child: SelectedItemCustomList(
                                 items: panels,
                                 onRemove: (id) => removePanel(id),
                               ),
                             ),
                             const Divider(),
                             Expanded(
-                              child: ListItemView(
+                              child: SelectedItemCustomList(
                                 items: tags,
                                 onRemove: (id) => removeTag(id),
                               ),
@@ -189,8 +191,8 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: PanelSearchTab()),
-                    CustomButton(
+                    Expanded(child: SearchPanelTab()),
+                    EditCustomButton(
                       text: '추가',
                       onPressed: () async {
                         final searchQuery =
@@ -220,8 +222,8 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                         }
                       },
                     ),
-                    Expanded(child: TagSearchTab()),
-                    CustomButton(
+                    Expanded(child: SearchTagTab()),
+                    EditCustomButton(
                       text: '추가',
                       onPressed: () async {
                         final searchQuery =
