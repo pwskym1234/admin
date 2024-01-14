@@ -25,21 +25,21 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: '어드민 웹'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends ConsumerWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({
+    super.key,
+  });
 
-  final String title;
-
-  // void _navigateToEmptyPage(BuildContext context) {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(builder: (context) => EmptyPage()),
-  //   );
-  // }
+  void _navigateToEmptyPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => EmptyPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,7 +50,23 @@ class MyHomePage extends ConsumerWidget {
       length: 2, // 탭의 개수
       child: Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () => _navigateToEmptyPage(context),
+                child: Text(
+                  '패널 생성',
+                  style: TextStyle(color: Colors.white), // 흰색 글씨
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.black, // 검은색 배경
+                ),
+              ),
+
+              // 여기에 추가적인 위젯을 넣을 수 있습니다.
+            ],
+          ),
         ),
         body: Row(
           children: [

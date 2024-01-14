@@ -103,6 +103,7 @@ final tagListProvider = FutureProvider<List<dynamic>>((ref) async {
   }
 });
 
+final selectedCategoryIdProvider = StateProvider<int?>((ref) => null);
 
 
 

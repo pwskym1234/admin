@@ -41,50 +41,15 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
     return videoDetails;
   }
 
-  // Future<void> addPanel(int panelId, String panelName) async {
-  //   await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
-  //   setState(() {
-  //     var newPanel = {
-  //       'id': panelId,
-  //       'name': panelName,
-  //     };
-  //     panels.add(newPanel);
-  //   });
-  // }
-
-  Future<void> addPanel(String panelName) async {
-    try {
-      final panelListAsyncValue = ref.watch(panelListProvider);
-
-      bool panelExists = false;
-      await panelListAsyncValue.whenData((panelList) {
-        panelExists = panelList.any((panel) => panel['name'] == panelName);
-      });
-
-      int panelId;
-      if (!panelExists) {
-        var newPanel =
-            await ref.read(apiServiceProvider).createPanel(panelName);
-        panelId = newPanel['id'];
-      } else {
-        panelId = panelListAsyncValue.value!.firstWhere(
-          (panel) => panel['name'] == panelName,
-          orElse: () => throw Exception('Panel not found'),
-        )['id'];
-      }
-
-      await ref
-          .read(apiServiceProvider)
-          .addPanelToVideo(widget.videoId, panelId);
-      setState(() {
-        tags.add({
-          'id': panelId,
-          'name': panelName,
-        });
-      });
-    } catch (e) {
-      print('Error adding tag: $e');
-    }
+  Future<void> addPanel(int panelId, String panelName) async {
+    await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
+    setState(() {
+      var newPanel = {
+        'id': panelId,
+        'name': panelName,
+      };
+      panels.add(newPanel);
+    });
   }
 
   Future<void> removePanel(int panelId) async {
@@ -238,7 +203,7 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                   children: [
                     Expanded(child: PanelSearchTab()),
                     Padding(
-                      padding: const EdgeInsets.only(top: 35), // 상단에만 패딩 적용
+                      padding: const EdgeInsets.only(top: 35),
                       child: TextButton(
                         onPressed: () async {
                           final searchQuery =
@@ -248,7 +213,22 @@ class VideoDetailsViewState extends ConsumerState<VideoDetailsView> {
                             final videoId = ref.watch(selectedVideoIdProvider);
 
                             if (videoId != null) {
-                              await addPanel(searchQuery);
+                              final panelListAsyncValue =
+                                  ref.watch(panelListProvider);
+
+                              await panelListAsyncValue
+                                  .whenData((panelList) async {
+                                final matchingPanel = panelList.firstWhere(
+                                  (panel) =>
+                                      panel['name'].toString() == searchQuery,
+                                  orElse: () => null,
+                                );
+
+                                if (matchingPanel != null) {
+                                  await addPanel(matchingPanel['id'],
+                                      matchingPanel['name']);
+                                } else {}
+                              });
                             }
                           }
                         },
