@@ -37,7 +37,7 @@ class MyHomePage extends ConsumerWidget {
 
   void _navigateToEmptyPage(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => EmptyPage()),
+      MaterialPageRoute(builder: (context) => CreatPanelPage()),
     );
   }
 

@@ -1,43 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/create_panel/logic/create_panel_controller.dart';
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:admin/data/apiservice.dart';
 import 'package:admin/feature/create_panel/widgets/panel_ideology_category_button_row.dart';
 import 'package:admin/feature/create_panel/widgets/create_panel_button.dart';
 import 'package:admin/feature/create_panel/widgets/panel_name_textfield.dart';
 import 'package:admin/feature/create_panel/widgets/panel_thumbnail_button.dart';
+import 'dart:html' as html;
+import 'dart:convert';
 
-class EmptyPage extends ConsumerStatefulWidget {
+class CreatPanelPage extends ConsumerStatefulWidget {
   @override
-  _EmptyPageState createState() => _EmptyPageState();
+  _CreatePanelPageState createState() => _CreatePanelPageState();
 }
 
-class _EmptyPageState extends ConsumerState<EmptyPage> {
+class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
   List<int>? imageByte;
   String? imageName;
   final TextEditingController panelNameController = TextEditingController();
   final TextEditingController categoryIdController = TextEditingController();
 
   Future<void> selectThumbnail() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        withData: true,
-      );
+    // Create an input element for file picking.
+    final input = html.FileUploadInputElement()..accept = 'image/*';
+    input.click(); // Trigger the file picker dialog.
 
-      if (result != null && result.files.isNotEmpty) {
-        setState(() {
-          PlatformFile platformFile = result.files.first;
-          imageByte = platformFile.bytes!;
-          imageName = platformFile.name;
+    // Listen for changes on the file input element.
+    input.onChange.listen((e) {
+      // Get the selected file.
+      final files = input.files;
+      if (files != null && files.isNotEmpty) {
+        final html.File file = files.first;
+
+        // Read the file as a data URL.
+        final reader = html.FileReader();
+        reader.readAsDataUrl(file);
+        reader.onLoadEnd.listen((event) {
+          setState(() {
+            // Use reader.result as the file data.
+            imageByte = base64.decode(reader.result.toString().split(",").last);
+            imageName = file.name;
+          });
+          print("File selected successfully.");
         });
-        print("File selected successfully.");
       }
-    } catch (e) {
-      print("Error during file selection: $e");
-    }
+    });
   }
+
+  // Future<void> selectThumbnail() async {
+  //   try {
+  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //       type: FileType.image,
+  //       withData: true,
+  //     );
+
+  //     if (result != null && result.files.isNotEmpty) {
+  //       setState(() {
+  //         PlatformFile platformFile = result.files.first;
+  //         imageByte = platformFile.bytes!;
+  //         imageName = platformFile.name;
+  //       });
+  //       print("File selected successfully.");
+  //     }
+  //   } catch (e) {
+  //     print("Error during file selection: $e");
+  //   }
+  // }
 
   void resetPage() {
     setState(() {
