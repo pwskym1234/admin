@@ -57,18 +57,20 @@ final panelListProvider = FutureProvider<List<dynamic>>((ref) async {
 
   try {
     final responses = await Future.wait([
-      apiService.fetchPanelList(1),
-      apiService.fetchPanelList(2),
-      apiService.fetchPanelList(3),
+      apiService.fetchPanelList(1, 0, 1000),
+      apiService.fetchPanelList(2, 0, 1000),
+      apiService.fetchPanelList(3, 0, 1000),
     ]);
+    // final responseLengths =
+    //     responses.map((response) => response.length).toList();
+    // print('각 응답 데이터의 길이: $responseLengths');
 
     final panelList = responses.expand((x) => x).toList();
 
     if (searchQuery != null && searchQuery.isNotEmpty) {
       // 검색어를 사용하여 필터링
       return panelList
-          .where(
-              (panelData) => panelData['name'].toString().contains(searchQuery))
+          .where((panelData) => panelData['name'].contains(searchQuery))
           .toList();
     } else {
       return panelList;
@@ -79,6 +81,8 @@ final panelListProvider = FutureProvider<List<dynamic>>((ref) async {
 });
 
 final searchTagQueryProvider = StateProvider<String?>((ref) => null);
+
+final searchVideoQueryProvider = StateProvider<String?>((ref) => null);
 
 final tagListProvider = FutureProvider<List<dynamic>>((ref) async {
   final searchQuery = ref.watch(searchTagQueryProvider);

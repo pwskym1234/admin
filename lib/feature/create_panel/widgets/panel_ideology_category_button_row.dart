@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PanelIdeologyCategoryButtonRow extends StatelessWidget {
-  final int? selectedCategoryId;
-  final Function(int) onSelectCategory;
+class PoliticalTypeButtonRow extends StatelessWidget {
+  final int? selectedPoliticalTypeId;
+  final Function(int) onSelectPoliticalType;
 
-  PanelIdeologyCategoryButtonRow({
-    required this.selectedCategoryId,
-    required this.onSelectCategory,
+  PoliticalTypeButtonRow({
+    required this.selectedPoliticalTypeId,
+    required this.onSelectPoliticalType,
   });
 
   @override
@@ -15,31 +15,34 @@ class PanelIdeologyCategoryButtonRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          onPressed: () => onSelectCategory(1),
+          onPressed: () => onSelectPoliticalType(1),
           child: Text('진보', style: TextStyle(color: Colors.white)),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith<Color>(
-              (states) => selectedCategoryId == 1 ? Colors.blue : Colors.grey,
+              (states) =>
+                  selectedPoliticalTypeId == 1 ? Colors.blue : Colors.grey,
             ),
           ),
         ),
         SizedBox(width: 5),
         ElevatedButton(
-          onPressed: () => onSelectCategory(2),
+          onPressed: () => onSelectPoliticalType(2),
           child: Text('중도', style: TextStyle(color: Colors.white)),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith<Color>(
-              (states) => selectedCategoryId == 2 ? Colors.purple : Colors.grey,
+              (states) =>
+                  selectedPoliticalTypeId == 2 ? Colors.purple : Colors.grey,
             ),
           ),
         ),
         SizedBox(width: 5),
         ElevatedButton(
-          onPressed: () => onSelectCategory(3),
+          onPressed: () => onSelectPoliticalType(3),
           child: Text('보수', style: TextStyle(color: Colors.white)),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith<Color>(
-              (states) => selectedCategoryId == 3 ? Colors.red : Colors.grey,
+              (states) =>
+                  selectedPoliticalTypeId == 3 ? Colors.red : Colors.grey,
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/home/logic/home_controller.dart';
+import 'search_untagged_video_tab.dart';
 
 class UntaggedVideoList extends ConsumerWidget {
   @override
@@ -8,10 +9,16 @@ class UntaggedVideoList extends ConsumerWidget {
     final untaggedVideoListNotifier =
         ref.read(untaggedVideoListProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 10);
+      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 50);
     });
 
     final videoList = ref.watch(untaggedVideoListProvider);
+    final searchVideoQuery = ref.watch(searchVideoQueryProvider) ?? '';
+
+    final filteredVideoList = videoList.where((video) {
+      return video['title'].contains(searchVideoQuery);
+    }).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -22,11 +29,12 @@ class UntaggedVideoList extends ConsumerWidget {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
+        SearchUntaggedVideoTab(),
         Expanded(
           child: ListView.builder(
-            itemCount: videoList.length,
+            itemCount: filteredVideoList.length,
             itemBuilder: (context, index) {
-              final item = videoList[index];
+              final item = filteredVideoList[index];
               return ListTile(
                 title: Text(item['title']),
                 onTap: () {

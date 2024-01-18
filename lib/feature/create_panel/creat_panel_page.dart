@@ -19,26 +19,21 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
   List<int>? imageByte;
   String? imageName;
   final TextEditingController panelNameController = TextEditingController();
-  final TextEditingController categoryIdController = TextEditingController();
+  // final TextEditingController categoryIdController = TextEditingController();
 
   Future<void> selectThumbnail() async {
-    // Create an input element for file picking.
     final input = html.FileUploadInputElement()..accept = 'image/*';
-    input.click(); // Trigger the file picker dialog.
+    input.click();
 
-    // Listen for changes on the file input element.
     input.onChange.listen((e) {
-      // Get the selected file.
       final files = input.files;
       if (files != null && files.isNotEmpty) {
         final html.File file = files.first;
 
-        // Read the file as a data URL.
         final reader = html.FileReader();
         reader.readAsDataUrl(file);
         reader.onLoadEnd.listen((event) {
           setState(() {
-            // Use reader.result as the file data.
             imageByte = base64.decode(reader.result.toString().split(",").last);
             imageName = file.name;
           });
@@ -71,31 +66,41 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
   void resetPage() {
     setState(() {
       panelNameController.clear();
-      categoryIdController.clear();
+      // categoryIdController.clear();
       imageByte = null;
       imageName = null;
-      ref.read(selectedCategoryIdProvider.notifier).state = null;
+      ref.read(selectedPoliticalTypeIdProvider.notifier).state = null;
     });
   }
 
   void createPanel() async {
     final String panelName = panelNameController.text;
-    final int categoryId = int.tryParse(categoryIdController.text) ?? 0;
+    // final int categoryId = int.tryParse(categoryIdController.text) ?? 0;
+    int? politicalTypeId = ref.watch(selectedPoliticalTypeIdProvider);
 
-    await ApiService().createPanel(panelName, categoryId, imageByte, imageName);
+    if (politicalTypeId != null) {
+      await ApiService()
+          .createPanel(panelName, politicalTypeId, imageByte, imageName);
+      print(politicalTypeId);
 
-    resetPage();
+      resetPage();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedCategoryId = ref.watch(selectedCategoryIdProvider);
+    final selectedPoliticalTypeId = ref.watch(selectedPoliticalTypeIdProvider);
 
-    void selectCategory(int categoryId) {
-      if (selectedCategoryId == categoryId) {
-        ref.read(selectedCategoryIdProvider.notifier).state = null;
+    void selectCategory(int politicalTypeId) {
+      if (selectedPoliticalTypeId == politicalTypeId) {
+        ref.read(selectedPoliticalTypeIdProvider.notifier).state = null;
+        print(ref.watch(selectedPoliticalTypeIdProvider));
+        print(politicalTypeId);
       } else {
-        ref.read(selectedCategoryIdProvider.notifier).state = categoryId;
+        ref.read(selectedPoliticalTypeIdProvider.notifier).state =
+            politicalTypeId;
+        print(ref.watch(selectedPoliticalTypeIdProvider));
+        print(politicalTypeId);
       }
     }
 
@@ -124,9 +129,9 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
                   },
                 ),
                 SizedBox(height: 24),
-                PanelIdeologyCategoryButtonRow(
-                  selectedCategoryId: selectedCategoryId,
-                  onSelectCategory: selectCategory,
+                PoliticalTypeButtonRow(
+                  selectedPoliticalTypeId: selectedPoliticalTypeId,
+                  onSelectPoliticalType: selectCategory,
                 ),
                 SizedBox(height: 100),
                 CreatePanelButton(onCreatePanel: createPanel),

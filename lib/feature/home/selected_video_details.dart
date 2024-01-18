@@ -7,6 +7,7 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:admin/feature/home/widgets/search_panel_tab.dart';
 import 'package:admin/feature/home/widgets/selected_items_custom_list.dart';
 import 'package:admin/feature/home/widgets/edit_custom_button.dart';
+import 'package:admin/feature/create_panel/creat_panel_page.dart';
 
 class SelectedVideoDetails extends ConsumerStatefulWidget {
   final int videoId;
@@ -104,6 +105,12 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     });
   }
 
+  void _navigateToEmptyPage(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => CreatPanelPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final videoId = ref.watch(selectedVideoIdProvider);
@@ -112,7 +119,9 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
       return const Center(child: Text('Select a video'));
     }
 
-    return FutureBuilder(
+    return SingleChildScrollView(
+        // 여기에 SingleChildScrollView를 추가합니다.
+        child: FutureBuilder(
       future: ref.read(apiServiceProvider).fetchVideoDetails(videoId),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -192,59 +201,89 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: SearchPanelTab()),
-                    EditCustomButton(
-                      text: '추가',
-                      onPressed: () async {
-                        final searchQuery =
-                            ref.read(searchPanelQueryProvider.notifier).state;
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          EditCustomButton(
+                            text: '추가',
+                            onPressed: () async {
+                              final searchQuery = ref
+                                  .read(searchPanelQueryProvider.notifier)
+                                  .state;
 
-                        if (searchQuery != null && searchQuery.isNotEmpty) {
-                          final videoId = ref.watch(selectedVideoIdProvider);
+                              if (searchQuery != null &&
+                                  searchQuery.isNotEmpty) {
+                                final videoId =
+                                    ref.watch(selectedVideoIdProvider);
 
-                          if (videoId != null) {
-                            final panelListAsyncValue =
-                                ref.watch(panelListProvider);
+                                if (videoId != null) {
+                                  final panelListAsyncValue =
+                                      ref.watch(panelListProvider);
 
-                            await panelListAsyncValue
-                                .whenData((panelList) async {
-                              final matchingPanel = panelList.firstWhere(
-                                (panel) =>
-                                    panel['name'].toString() == searchQuery,
-                                orElse: () => null,
-                              );
+                                  await panelListAsyncValue
+                                      .whenData((panelList) async {
+                                    final matchingPanel = panelList.firstWhere(
+                                      (panel) =>
+                                          panel['name'].toString() ==
+                                          searchQuery,
+                                      orElse: () => null,
+                                    );
 
-                              if (matchingPanel != null) {
-                                await addPanel(
-                                    matchingPanel['id'], matchingPanel['name']);
-                              } else {}
-                            });
-                          }
-                        }
-                      },
-                    ),
+                                    if (matchingPanel != null) {
+                                      await addPanel(matchingPanel['id'],
+                                          matchingPanel['name']);
+                                    } else {}
+                                  });
+                                }
+                              }
+                            },
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 8.0),
+                            child: TextButton(
+                              onPressed: () => _navigateToEmptyPage(context),
+                              child: Text(
+                                '생성',
+                                style: TextStyle(color: Colors.white), // 흰색 글씨
+                              ),
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.black, // 검은색 배경
+                              ),
+                            ),
+                          )
+                        ]),
                     Expanded(child: SearchTagTab()),
-                    EditCustomButton(
-                      text: '추가',
-                      onPressed: () async {
-                        final searchQuery =
-                            ref.read(searchTagQueryProvider.notifier).state;
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                      child: EditCustomButton(
+                        text: '추가',
+                        onPressed: () async {
+                          final searchQuery =
+                              ref.read(searchTagQueryProvider.notifier).state;
 
-                        if (searchQuery != null && searchQuery.isNotEmpty) {
-                          final videoId = ref.watch(selectedVideoIdProvider);
+                          if (searchQuery != null && searchQuery.isNotEmpty) {
+                            final videoId = ref.watch(selectedVideoIdProvider);
 
-                          if (videoId != null) {
-                            await addTag(searchQuery);
+                            if (videoId != null) {
+                              await addTag(searchQuery);
+                            }
                           }
-                        }
-                      },
+                        },
+                      ),
                     ),
                   ],
+                ),
+                Text(
+                  videoData['description'],
+                  style: const TextStyle(
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
           ),
         );
       },
-    );
+    ));
   }
 }

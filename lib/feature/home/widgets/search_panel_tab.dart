@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/home/logic/home_controller.dart';
-import 'package:admin/data/apiservice.dart';
 
 class SearchPanelTab extends ConsumerWidget {
   @override
@@ -55,23 +54,5 @@ class SearchPanelTab extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Future<List<dynamic>> _fetchAndFilterPanelList(WidgetRef ref) async {
-    final searchQuery = ref.read(searchPanelQueryProvider.notifier).state ?? "";
-    final apiService = ref.read(apiServiceProvider);
-    final responses = await Future.wait([
-      apiService.fetchPanelList(1),
-      apiService.fetchPanelList(2),
-      apiService.fetchPanelList(3),
-    ]);
-    final panelList = responses.expand((x) => x).toList();
-
-    return searchQuery.isNotEmpty
-        ? panelList
-            .where((panelData) =>
-                panelData['name'].toString().contains(searchQuery))
-            .toList()
-        : panelList;
   }
 }

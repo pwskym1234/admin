@@ -67,12 +67,15 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchPanelList(int political_type) async {
+  Future<List<dynamic>> fetchPanelList(
+      int political_type, int offset, int limit) async {
     try {
       final response = await _dio.get(
         'https://a-zit.tv/api/v1/panel/list',
         queryParameters: {
           'political_type': political_type,
+          'offset': offset,
+          'limit': limit
         },
       );
       return response.data;
@@ -183,12 +186,12 @@ class ApiService {
     }
   }
 
-  Future<dynamic> createPanel(String panelName, int categoryId,
+  Future<dynamic> createPanel(String panelName, int politicalTypeId,
       List<int>? imageByte, String? fileName) async {
     try {
       Map<String, dynamic> data = {
         'name': panelName,
-        'category': categoryId,
+        'political_type': politicalTypeId,
       };
       if (imageByte != null && fileName != null) {
         data.putIfAbsent('thumbnail_url',
@@ -198,15 +201,15 @@ class ApiService {
           data: FormData.fromMap(data));
 
       if (response.statusCode == 201) {
-        print('Tag created successfully: ${response.data}');
+        print('Panel created successfully: ${response.data}');
         return response.data;
       } else {
-        print('Failed to create tag');
-        throw Exception('Failed to create tag');
+        print('Failed to create panel');
+        throw Exception('Failed to create panel');
       }
     } catch (e) {
-      print('Exception occurred while creating tag: $e');
-      throw Exception('Exception occurred while creating tag: $e');
+      print('Exception occurred while creating panel: $e');
+      throw Exception('Exception occurred while creating panel: $e');
     }
   }
 }
