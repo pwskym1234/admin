@@ -8,6 +8,7 @@ import 'package:admin/feature/home/widgets/search_panel_tab.dart';
 import 'package:admin/feature/home/widgets/selected_items_custom_list.dart';
 import 'package:admin/feature/home/widgets/edit_custom_button.dart';
 import 'package:admin/feature/create_panel/creat_panel_page.dart';
+import 'package:admin/feature/home/logic/openai.dart';
 
 class SelectedVideoDetails extends ConsumerStatefulWidget {
   final int videoId;
@@ -21,12 +22,19 @@ class SelectedVideoDetails extends ConsumerStatefulWidget {
 
 class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
   late Future<dynamic> videoDetailsFuture;
+
   List<dynamic> panels = [];
   List<dynamic> tags = [];
+
+  late OpenAiTagGenerator tagGenerator;
+  late OpenAiTagSuggester tagSuggester;
   @override
   void initState() {
     super.initState();
     videoDetailsFuture = fetchVideoDetails();
+    String openAiApiKey = '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';
+    tagGenerator = OpenAiTagGenerator(openAiApiKey);
+    tagSuggester = OpenAiTagSuggester(openAiApiKey);
   }
 
   Future<dynamic> fetchVideoDetails() async {
@@ -37,7 +45,7 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
         ? videoDetails['panels'] as List<dynamic>
         : [];
 
-    panels = videoDetails['tags'] != null
+    tags = videoDetails['tags'] != null
         ? videoDetails['tags'] as List<dynamic>
         : [];
 
@@ -96,6 +104,34 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     }
   }
 
+  Future<void> addCreatedTagsToVideo(String videoTitle, int videoId,
+      OpenAiTagGenerator tagGenerator, String videoDescription) async {
+    Stopwatch stopwatch = Stopwatch()..start();
+    List<String> createdTags =
+        await tagGenerator.generateTags(videoTitle, videoDescription);
+
+    for (var tag in createdTags) {
+      try {
+        var createdTag = await ref.read(apiServiceProvider).createTag(tag);
+        int createdTagId = createdTag['id'];
+        String createdTagName = createdTag['name'];
+
+        await ref.read(apiServiceProvider).addTagToVideo(videoId, createdTagId);
+
+        setState(() {
+          tags.add({
+            'id': createdTagId,
+            'name': createdTagName,
+          });
+        });
+      } catch (e) {
+        print('Error adding tag "$tag": $e');
+      }
+    }
+    stopwatch.stop();
+    print('Time taken to add tags: ${stopwatch.elapsed.inMilliseconds} ms');
+  }
+
   Future<void> removeTag(int tagId) async {
     await ref
         .read(apiServiceProvider)
@@ -103,6 +139,34 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     setState(() {
       tags.removeWhere((tag) => tag['id'] == tagId);
     });
+  }
+
+  Future<void> deleteTag(int tagId) async {
+    await ref.read(apiServiceProvider).deleteTag(tagId);
+  }
+
+  Future<void> addMatchingTagsToVideo(
+      String videoTitle, int videoId, String videoDescription) async {
+    try {
+      String suggestedTagName =
+          await tagSuggester.suggestTag(videoTitle, videoDescription);
+      var existingTags = await ref.read(apiServiceProvider).fetchTagList();
+      var matchingTag = existingTags.firstWhere(
+        (tag) => tag['name'].toString() == suggestedTagName,
+        orElse: () => null,
+      );
+
+      if (matchingTag != null) {
+        await ref
+            .read(apiServiceProvider)
+            .addTagToVideo(videoId, matchingTag['id']);
+        setState(() {
+          tags.add(matchingTag);
+        });
+      }
+    } catch (e) {
+      print('Error adding matching tags: $e');
+    }
   }
 
   void _navigateToEmptyPage(BuildContext context) {
@@ -252,24 +316,88 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                             ),
                           )
                         ]),
-                    Expanded(child: SearchTagTab()),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
-                      child: EditCustomButton(
-                        text: '추가',
-                        onPressed: () async {
-                          final searchQuery =
-                              ref.read(searchTagQueryProvider.notifier).state;
+                    Expanded(
+                        child: SearchTagTab(
+                      onDelete: (id) => deleteTag(id),
+                    )),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
+                          child: EditCustomButton(
+                            text: '직접 추가',
+                            onPressed: () async {
+                              // 추가 눌렀을 때 태그 자동 생성하고 추가하기
+                              // final videoTitle = videoData['title'];
+                              // final videoId = ref.watch(selectedVideoIdProvider);
+                              // if (videoTitle != null && videoId != null) {
+                              //   await addCreatedTagsToVideo(
+                              //       videoTitle, videoId, tagGenerator);
+                              // }
 
-                          if (searchQuery != null && searchQuery.isNotEmpty) {
-                            final videoId = ref.watch(selectedVideoIdProvider);
+                              // 추가 눌렀을 때 작성한 태그 추가하기
+                              final searchQuery = ref
+                                  .read(searchTagQueryProvider.notifier)
+                                  .state;
 
-                            if (videoId != null) {
-                              await addTag(searchQuery);
-                            }
-                          }
-                        },
-                      ),
+                              if (searchQuery != null &&
+                                  searchQuery.isNotEmpty) {
+                                final videoId =
+                                    ref.watch(selectedVideoIdProvider);
+
+                                if (videoId != null) {
+                                  await addTag(searchQuery);
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: TextButton(
+                            onPressed: () async {
+                              final videoTitle = videoData['title'];
+                              final videoDescription = videoData['description'];
+                              final videoId =
+                                  ref.watch(selectedVideoIdProvider);
+                              if (videoTitle != null && videoId != null) {
+                                await addCreatedTagsToVideo(videoTitle, videoId,
+                                    tagGenerator, videoDescription);
+                              }
+                            },
+                            child: Text(
+                              'AI 생성 태그 추가',
+                              style: TextStyle(color: Colors.white), // 흰색 글씨
+                            ),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.black, // 검은색 배경
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 8, 8, 0),
+                          child: TextButton(
+                            onPressed: () async {
+                              final videoTitle = videoData['title'];
+                              final videoDescription = videoData['description'];
+                              final videoId =
+                                  ref.watch(selectedVideoIdProvider);
+                              if (videoTitle != null && videoId != null) {
+                                await addMatchingTagsToVideo(
+                                    videoTitle, videoId, videoDescription);
+                              }
+                            },
+                            child: Text(
+                              '기존 태그 중 AI 추가',
+                              style: TextStyle(color: Colors.white), // 흰색 글씨
+                            ),
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.black, // 검은색 배경
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

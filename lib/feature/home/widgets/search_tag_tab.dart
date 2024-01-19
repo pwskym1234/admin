@@ -4,6 +4,12 @@ import 'package:admin/feature/home/logic/home_controller.dart';
 import 'package:admin/data/apiservice.dart';
 
 class SearchTagTab extends ConsumerWidget {
+  final Function(int id) onDelete;
+
+  const SearchTagTab({
+    Key? key,
+    required this.onDelete,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
@@ -34,6 +40,16 @@ class SearchTagTab extends ConsumerWidget {
                             final tagData = tagDataList[index];
                             return ListTile(
                               title: Text(tagData['name'].toString()),
+                              trailing: IconButton(
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () async {
+                                    try {
+                                      await onDelete(tagData['id']);
+                                      ref.refresh(tagListProvider);
+                                    } catch (e) {
+                                      print('Error deleting tag: $e');
+                                    }
+                                  }),
                             );
                           },
                         ));
@@ -60,7 +76,7 @@ class SearchTagTab extends ConsumerWidget {
   Future<List<dynamic>> _fetchAndFilterTagList(WidgetRef ref) async {
     final searchQuery = ref.read(searchTagQueryProvider.notifier).state ?? "";
     final apiService = ref.read(apiServiceProvider);
-    final tagList = await apiService.fetchTagList();
+    final tagList = await apiService.fetchLiveTagList();
 
     return searchQuery.isNotEmpty
         ? tagList

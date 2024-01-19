@@ -9,7 +9,7 @@ class UntaggedVideoList extends ConsumerWidget {
     final untaggedVideoListNotifier =
         ref.read(untaggedVideoListProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 50);
+      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 100);
     });
 
     final videoList = ref.watch(untaggedVideoListProvider);

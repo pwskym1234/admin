@@ -119,7 +119,7 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchTagList() async {
+  Future<List<dynamic>> fetchLiveTagList() async {
     try {
       final response = await _dio.get(
         'https://a-zit.tv/api/v1/tag/list',
@@ -163,6 +163,18 @@ class ApiService {
     } catch (e) {
       print('Exception occurred while removing tag: $e');
       throw Exception('Exception occurred while removing tag: $e');
+    }
+  }
+
+  Future<List<dynamic>> fetchTagList() async {
+    try {
+      final response = await _dio.get(
+        'https://a-zit.tv/api/v1/tag/admin',
+        queryParameters: {},
+      );
+      return response.data;
+    } catch (e) {
+      throw Exception('Error fetching tag list: $e');
     }
   }
 
@@ -210,6 +222,29 @@ class ApiService {
     } catch (e) {
       print('Exception occurred while creating panel: $e');
       throw Exception('Exception occurred while creating panel: $e');
+    }
+  }
+
+  Future<dynamic> deleteTag(int tagId) async {
+    try {
+      final response = await _dio.post(
+        'https://a-zit.tv/api/v1/tag/delete',
+        queryParameters: {
+          'id': tagId,
+        },
+        data: {'admin_password': 'g_hole_admin'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Tag deleted successfully: ${response.data}');
+        return response.data;
+      } else {
+        print('Failed to delete tag');
+        throw Exception('Failed to delete tag');
+      }
+    } catch (e) {
+      print('Exception occurred while deleting tag: $e');
+      throw Exception('Exception occurred while deleting tag: $e');
     }
   }
 }
