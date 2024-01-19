@@ -1,5 +1,5 @@
 import 'package:openai_dart/openai_dart.dart';
-import 'package:admin/data/apiservice.dart';
+import 'package:admin/data/api/apiservice.dart';
 
 class OpenAiTagGenerator {
   final String apiKey;

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/data/apiservice.dart';
+import 'package:admin/data/api/apiservice.dart';
 
 final videoListProvider =
     StateNotifierProvider<VideoListNotifier, List<dynamic>>((ref) {
