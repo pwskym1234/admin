@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/create_panel/logic/create_panel_controller.dart';
 // import 'package:file_picker/file_picker.dart';
-import 'package:admin/data/api/apiservice.dart';
 import 'package:admin/feature/create_panel/widgets/panel_ideology_category_button_row.dart';
 import 'package:admin/feature/create_panel/widgets/create_panel_button.dart';
 import 'package:admin/feature/create_panel/widgets/panel_name_textfield.dart';
 import 'package:admin/feature/create_panel/widgets/panel_thumbnail_button.dart';
 import 'dart:html' as html;
 import 'dart:convert';
+import 'package:admin/data/service/server_api_service.dart';
 
 class CreatPanelPage extends ConsumerStatefulWidget {
   @override
@@ -79,8 +79,11 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
     int? politicalTypeId = ref.watch(selectedPoliticalTypeIdProvider);
 
     if (politicalTypeId != null) {
-      await ApiService()
-          .createPanel(panelName, politicalTypeId, imageByte, imageName);
+      await ServerApiService().createPanel(
+          panelName: panelName,
+          politicalTypeId: politicalTypeId,
+          imageByte: imageByte,
+          fileName: imageName);
       print(politicalTypeId);
 
       resetPage();

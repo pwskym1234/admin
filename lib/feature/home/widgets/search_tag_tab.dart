@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/feature/home/logic/home_controller.dart';
-import 'package:admin/data/api/apiservice.dart';
+import 'package:admin/feature/home/logic/home_provider.dart';
+import 'package:admin/data/model/video_tag.dart';
+import 'package:admin/data/service/server_api_service.dart';
 
 class SearchTagTab extends ConsumerWidget {
   final Function(int id) onDelete;
@@ -37,14 +38,14 @@ class SearchTagTab extends ConsumerWidget {
                         child: ListView.builder(
                           itemCount: tagDataList.length,
                           itemBuilder: (context, index) {
-                            final tagData = tagDataList[index];
+                            final VideoTag tagData = tagDataList[index];
                             return ListTile(
-                              title: Text(tagData['name'].toString()),
+                              title: Text(tagData.name),
                               trailing: IconButton(
                                   icon: const Icon(Icons.close),
                                   onPressed: () async {
                                     try {
-                                      await onDelete(tagData['id']);
+                                      await onDelete(tagData.id);
                                       ref.refresh(tagListProvider);
                                     } catch (e) {
                                       print('Error deleting tag: $e');
@@ -71,18 +72,5 @@ class SearchTagTab extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Future<List<dynamic>> _fetchAndFilterTagList(WidgetRef ref) async {
-    final searchQuery = ref.read(searchTagQueryProvider.notifier).state ?? "";
-    final apiService = ref.read(apiServiceProvider);
-    final tagList = await apiService.fetchLiveTagList();
-
-    return searchQuery.isNotEmpty
-        ? tagList
-            .where(
-                (tagData) => tagData['name'].toString().contains(searchQuery))
-            .toList()
-        : tagList;
   }
 }

@@ -40,6 +40,7 @@ dependencies:
   freezed: # mit
   json_serializable: ^6.7.1 # bsd-3
   build_runner: ^2.4.7
+  firebase_crashlytics: ^3.4.9 # BSD-3
   
 
   freezed_annotation: ^2.4.1 # mit

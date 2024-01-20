@@ -17,10 +17,10 @@ class SelectedItemCustomList extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         return ListTile(
-          title: Text(item['name']),
+          title: Text(item.name),
           trailing: IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => onRemove(item['id']),
+            onPressed: () => onRemove(item.id),
           ),
         );
       },

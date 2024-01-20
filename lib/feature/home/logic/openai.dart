@@ -1,5 +1,6 @@
 import 'package:openai_dart/openai_dart.dart';
-import 'package:admin/data/api/apiservice.dart';
+
+import 'package:admin/data/service/server_api_service.dart';
 
 class OpenAiTagGenerator {
   final String apiKey;
@@ -44,7 +45,7 @@ class OpenAiTagSuggester {
   OpenAiTagSuggester(this.apiKey);
 
   Future<String> suggestTag(String videoTitle, String videoDescription) async {
-    List<dynamic> existingTags = await ApiService().fetchTagList();
+    List<dynamic> existingTags = await ServerApiService().fetchTagList();
 
     String prompt =
         "Given the video title '$videoTitle' and '$videoDescription', suggest the most relevant tag from the following list: ${existingTags.map((e) => e['name']).join(', ')}.";

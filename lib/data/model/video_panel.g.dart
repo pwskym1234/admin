@@ -7,7 +7,13 @@ part of 'video_panel.dart';
 // **************************************************************************
 
 _$VideoPanelImpl _$$VideoPanelImplFromJson(Map<String, dynamic> json) =>
-    _$VideoPanelImpl();
+    _$VideoPanelImpl(
+      id: json['id'] as int,
+      name: json['name'] as String,
+    );
 
 Map<String, dynamic> _$$VideoPanelImplToJson(_$VideoPanelImpl instance) =>
-    <String, dynamic>{};
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+    };

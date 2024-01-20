@@ -1,7 +1,9 @@
+import 'package:admin/data/enum/video_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/feature/home/logic/home_provider.dart';
 import 'search_untagged_video_tab.dart';
+import 'package:admin/data/model/video.dart';
 
 class UntaggedVideoList extends ConsumerWidget {
   @override
@@ -9,14 +11,15 @@ class UntaggedVideoList extends ConsumerWidget {
     final untaggedVideoListNotifier =
         ref.read(untaggedVideoListProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      untaggedVideoListNotifier.getUntaggedVideos('VIDEO', 'false', 0, 100);
+      untaggedVideoListNotifier.getUntaggedVideos(
+          VideoType.video, 'false', 0, 100);
     });
 
     final videoList = ref.watch(untaggedVideoListProvider);
     final searchVideoQuery = ref.watch(searchVideoQueryProvider) ?? '';
 
     final filteredVideoList = videoList.where((video) {
-      return video['title'].contains(searchVideoQuery);
+      return video.title.contains(searchVideoQuery);
     }).toList();
 
     return Column(
@@ -34,12 +37,12 @@ class UntaggedVideoList extends ConsumerWidget {
           child: ListView.builder(
             itemCount: filteredVideoList.length,
             itemBuilder: (context, index) {
-              final item = filteredVideoList[index];
+              final Video item = filteredVideoList[index];
               return ListTile(
-                title: Text(item['title']),
+                title: Text(item.title),
                 onTap: () {
-                  ref.read(selectedVideoIdProvider.notifier).state = item['id'];
-                  print(item['id']);
+                  ref.read(selectedVideoIdProvider.notifier).state = item.id;
+                  print(item.id);
                   // 아이템 탭에 대한 액션을 여기에 추가하세요.
                 },
               );

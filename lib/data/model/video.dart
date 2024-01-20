@@ -33,8 +33,8 @@ class Video with _$Video {
   factory Video({
     required int id,
     required String title,
-    required String description,
     required String thumbnail_url,
+    String? description,
     required String youtube_link,
     required int view_count,
     required String type,

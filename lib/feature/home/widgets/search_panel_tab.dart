@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/feature/home/logic/home_provider.dart';
+import 'package:admin/data/model/panel.dart';
 
 class SearchPanelTab extends ConsumerWidget {
   @override
@@ -30,9 +31,9 @@ class SearchPanelTab extends ConsumerWidget {
                         child: ListView.builder(
                           itemCount: panelDataList.length,
                           itemBuilder: (context, index) {
-                            final panelData = panelDataList[index];
+                            final Panel panelData = panelDataList[index];
                             return ListTile(
-                              title: Text(panelData['name'].toString()),
+                              title: Text(panelData.name.toString()),
                             );
                           },
                         ));

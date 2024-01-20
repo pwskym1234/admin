@@ -1,104 +1,157 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/data/api/apiservice.dart';
 
-final videoListProvider =
-    StateNotifierProvider<VideoListNotifier, List<dynamic>>((ref) {
-  return VideoListNotifier(ref);
-});
+// import 'package:flutter/material.dart';
+// import 'package:admin/feature/home/logic/home_provider.dart';
 
-class VideoListNotifier extends StateNotifier<List<dynamic>> {
-  VideoListNotifier(this.ref) : super([]);
 
-  final Ref ref;
-  ApiService get _apiService => ref.read(apiServiceProvider);
+// import 'package:admin/feature/create_panel/creat_panel_page.dart';
+// import 'package:admin/feature/home/logic/openai.dart';
+// import 'package:admin/data/service/server_api_service.dart';
 
-  Future<void> getVideos(String type, int offset, int limit) async {
-    try {
-      final videos = await _apiService.fetchVideoList(type, offset, limit);
-      state = videos;
-    } catch (e) {
-      print("API 호출 중 오류가 발생했습니다: $e");
-      state = [];
-    }
-  }
-}
 
-final untaggedVideoListProvider =
-    StateNotifierProvider<UntaggedVideoListNotifier, List<dynamic>>((ref) {
-  return UntaggedVideoListNotifier(ref);
-});
 
-class UntaggedVideoListNotifier extends StateNotifier<List<dynamic>> {
-  UntaggedVideoListNotifier(this.ref) : super([]);
+// class HomeController {
+//   final ServerApiService apiService;
+//   final OpenAiTagGenerator tagGenerator;
+//   final OpenAiTagSuggester tagSuggester;
+//   List<dynamic> panels = [];
+//   List<dynamic> tags = [];
 
-  final Ref ref;
-  ApiService get _apiService => ref.read(apiServiceProvider);
+//   HomeController(this.apiService, this.tagGenerator, this.tagSuggester);
+// Future<dynamic> fetchVideoDetails(int videoId) async {
+//     var videoDetails = await ServerApiService.fetchVideoDetails(videoId: videoId);
 
-  Future<void> getUntaggedVideos(
-      String type, String tag_added, int offset, int limit) async {
-    try {
-      final videos = await _apiService.fetchUntaggedVideoList(
-          type, tag_added, offset, limit);
-      state = videos;
-    } catch (e) {
-      print("API 호출 중 오류가 발생했습니다: $e");
-      state = [];
-    }
-  }
-}
+//     panels = videoDetails.panels;
 
-final selectedVideoIdProvider = StateProvider<int?>((ref) => null);
+//     tags = videoDetails.tags;
 
-final searchPanelQueryProvider = StateProvider<String?>((ref) => null);
+//     return videoDetails;
+//   }
 
-final panelListProvider = FutureProvider<List<dynamic>>((ref) async {
-  final searchQuery = ref.watch(searchPanelQueryProvider);
-  final apiService = ref.read(apiServiceProvider); // ApiService 인스턴스 가져오기
+//   Future<void> addPanel(int panelId, String panelName) async {
+//     await ServerApiService
+//         .addPanelToVideo(videoId: videoId, panelId);
+//     setState(() {
+//       var newPanel = {
+//         'id': panelId,
+//         'name': panelName,
+//       };
+//       panels.add(newPanel);
+//     });
+//   }
 
-  try {
-    final responses = await Future.wait([
-      apiService.fetchPanelList(1, 0, 1000),
-      apiService.fetchPanelList(2, 0, 1000),
-      apiService.fetchPanelList(3, 0, 1000),
-    ]);
-    // final responseLengths =
-    //     responses.map((response) => response.length).toList();
-    // print('각 응답 데이터의 길이: $responseLengths');
+//   Future<void> removePanel(int panelId) async {
+//     await ref
+//         .read(serverApiServiceProvider)
+//         .removePanelFromVideo(widget.videoId, panelId);
+//     setState(() {
+//       panels.removeWhere((panel) => panel['id'] == panelId);
+//     });
+//   }
 
-    final panelList = responses.expand((x) => x).toList();
+//   Future<void> addTag(String tagName) async {
+//     try {
+//       final tagListAsyncValue = ref.watch(tagListProvider);
 
-    if (searchQuery != null && searchQuery.isNotEmpty) {
-      // 검색어를 사용하여 필터링
-      return panelList
-          .where((panelData) => panelData['name'].contains(searchQuery))
-          .toList();
-    } else {
-      return panelList;
-    }
-  } catch (e) {
-    throw Exception('패널 목록 불러오기 실패: $e');
-  }
-});
+//       bool tagExists = false;
+//       await tagListAsyncValue.whenData((tagList) {
+//         tagExists = tagList.any((tag) => tag['name'] == tagName);
+//       });
 
-final searchTagQueryProvider = StateProvider<String?>((ref) => null);
+//       int tagId;
+//       if (!tagExists) {
+//         var newTag =
+//             await ref.read(serverApiServiceProvider).createTag(tagName);
+//         tagId = newTag.id;
+//       } else {
+//         tagId = tagListAsyncValue.value!.firstWhere(
+//           (tag) => tag['name'] == tagName,
+//           orElse: () => throw Exception('Tag not found'),
+//         )['id'];
+//       }
 
-final searchVideoQueryProvider = StateProvider<String?>((ref) => null);
+//       await ref
+//           .read(serverApiServiceProvider)
+//           .addTagToVideo(widget.videoId, tagId);
+//       setState(() {
+//         tags.add({
+//           'id': tagId,
+//           'name': tagName,
+//         });
+//       });
+//     } catch (e) {
+//       print('Error adding tag: $e');
+//     }
+//   }
 
-final tagListProvider = FutureProvider<List<dynamic>>((ref) async {
-  final searchQuery = ref.watch(searchTagQueryProvider);
-  final apiService = ref.read(apiServiceProvider);
+//   Future<void> addCreatedTagsToVideo(String videoTitle, int videoId,
+//       OpenAiTagGenerator tagGenerator, String videoDescription) async {
+//     Stopwatch stopwatch = Stopwatch()..start();
+//     List<String> createdTags =
+//         await tagGenerator.generateTags(videoTitle, videoDescription);
 
-  try {
-    final tagList = await apiService.fetchTagList();
+//     for (var tag in createdTags) {
+//       try {
+//         var createdTag =
+//             await ref.read(serverApiServiceProvider).createTag(tag);
+//         int createdTagId = createdTag['id'];
+//         String createdTagName = createdTag['name'];
 
-    if (searchQuery != null && searchQuery.isNotEmpty) {
-      return tagList
-          .where((tagData) => tagData['name'].toString().contains(searchQuery))
-          .toList();
-    } else {
-      return tagList;
-    }
-  } catch (e) {
-    throw Exception('태그 목록 불러오기 실패: $e');
-  }
-});
+//         await ref
+//             .read(serverApiServiceProvider)
+//             .addTagToVideo(videoId, createdTagId);
+
+//         setState(() {
+//           tags.add({
+//             'id': createdTagId,
+//             'name': createdTagName,
+//           });
+//         });
+//       } catch (e) {
+//         print('Error adding tag "$tag": $e');
+//       }
+//     }
+//     stopwatch.stop();
+//     print('Time taken to add tags: ${stopwatch.elapsed.inMilliseconds} ms');
+//   }
+
+//   Future<void> removeTag(int tagId) async {
+//     await ref
+//         .read(serverApiServiceProvider)
+//         .removeTagFromVideo(widget.videoId, tagId);
+//     setState(() {
+//       tags.removeWhere((tag) => tag['id'] == tagId);
+//     });
+//   }
+
+//   Future<void> deleteTag(int tagId) async {
+//     await ref.read(serverApiServiceProvider).deleteTag(tagId);
+//   }
+
+//   Future<void> addMatchingTagsToVideo(
+//       String videoTitle, int videoId, String videoDescription) async {
+//     try {
+//       String suggestedTagName =
+//           await tagSuggester.suggestTag(videoTitle, videoDescription);
+//       var existingTags =
+//           await ref.read(serverApiServiceProvider).fetchTagList();
+//       var matchingTag = existingTags.firstWhere(
+//         (tag) => tag.name == suggestedTagName,
+//       );
+
+//       await ref
+//           .read(serverApiServiceProvider)
+//           .addTagToVideo(videoId, matchingTag.id);
+//       setState(() {
+//         tags.add(matchingTag);
+//       });
+//     } catch (e) {
+//       print('Error adding matching tags: $e');
+//     }
+//   }
+
+//   void _navigateToEmptyPage(BuildContext context) {
+//     Navigator.of(context).push(
+//       MaterialPageRoute(builder: (context) => CreatPanelPage()),
+//     );
+//   }
+// }

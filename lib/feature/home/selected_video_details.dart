@@ -1,7 +1,7 @@
 import 'package:admin/feature/home/widgets/search_tag_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/feature/home/logic/home_controller.dart';
-import 'package:admin/data/api/apiservice.dart';
+import 'package:admin/feature/home/logic/home_provider.dart';
+import 'package:admin/data/model/video_tag.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:admin/feature/home/widgets/search_panel_tab.dart';
@@ -9,6 +9,9 @@ import 'package:admin/feature/home/widgets/selected_items_custom_list.dart';
 import 'package:admin/feature/home/widgets/edit_custom_button.dart';
 import 'package:admin/feature/create_panel/creat_panel_page.dart';
 import 'package:admin/feature/home/logic/openai.dart';
+import 'package:admin/data/service/server_api_service.dart';
+import 'package:admin/data/model/panel.dart';
+import 'package:admin/data/model/video_panel.dart';
 
 class SelectedVideoDetails extends ConsumerStatefulWidget {
   final int videoId;
@@ -31,44 +34,46 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
   @override
   void initState() {
     super.initState();
-    videoDetailsFuture = fetchVideoDetails();
-    String openAiApiKey = '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';
+    // videoDetailsFuture = fetchVideoDetails();
+    String openAiApiKey = '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';
     tagGenerator = OpenAiTagGenerator(openAiApiKey);
     tagSuggester = OpenAiTagSuggester(openAiApiKey);
   }
 
   Future<dynamic> fetchVideoDetails() async {
-    var videoDetails =
-        await ref.read(apiServiceProvider).fetchVideoDetails(widget.videoId);
+    var videoDetails = await ref
+        .read(serverApiServiceProvider)
+        .fetchVideoDetails(videoId: widget.videoId);
 
-    panels = videoDetails['panels'] != null
-        ? videoDetails['panels'] as List<dynamic>
-        : [];
+    panels = videoDetails.panels;
 
-    tags = videoDetails['tags'] != null
-        ? videoDetails['tags'] as List<dynamic>
-        : [];
+    tags = videoDetails.tags;
 
     return videoDetails;
   }
 
   Future<void> addPanel(int panelId, String panelName) async {
-    await ref.read(apiServiceProvider).addPanelToVideo(widget.videoId, panelId);
-    setState(() {
-      var newPanel = {
-        'id': panelId,
-        'name': panelName,
-      };
-      panels.add(newPanel);
-    });
+    try {
+      await ref
+          .read(serverApiServiceProvider)
+          .addPanelToVideo(videoId: widget.videoId, panelId: panelId);
+
+      setState(() {
+        var newPanel = VideoPanel(id: panelId, name: panelName);
+
+        panels.add(newPanel);
+      });
+    } catch (e) {
+      print('Error adding tag: $e');
+    }
   }
 
   Future<void> removePanel(int panelId) async {
     await ref
-        .read(apiServiceProvider)
-        .removePanelFromVideo(widget.videoId, panelId);
+        .read(serverApiServiceProvider)
+        .removePanelFromVideo(videoId: widget.videoId, panelId: panelId);
     setState(() {
-      panels.removeWhere((panel) => panel['id'] == panelId);
+      panels.removeWhere((panel) => panel.id == panelId);
     });
   }
 
@@ -78,21 +83,26 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
 
       bool tagExists = false;
       await tagListAsyncValue.whenData((tagList) {
-        tagExists = tagList.any((tag) => tag['name'] == tagName);
+        tagExists = tagList.any((tag) => tag.name == tagName);
       });
 
       int tagId;
       if (!tagExists) {
-        var newTag = await ref.read(apiServiceProvider).createTag(tagName);
-        tagId = newTag['id'];
+        VideoTag newTag =
+            await ref.read(serverApiServiceProvider).createTag(tagName);
+        tagId = newTag.id;
       } else {
-        tagId = tagListAsyncValue.value!.firstWhere(
-          (tag) => tag['name'] == tagName,
-          orElse: () => throw Exception('Tag not found'),
-        )['id'];
+        tagId = tagListAsyncValue.value!
+            .firstWhere(
+              (tag) => tag.name == tagName,
+              orElse: () => throw Exception('Tag not found'),
+            )
+            .id;
       }
 
-      await ref.read(apiServiceProvider).addTagToVideo(widget.videoId, tagId);
+      await ref
+          .read(serverApiServiceProvider)
+          .addTagToVideo(videoId: widget.videoId, tagId: tagId);
       setState(() {
         tags.add({
           'id': tagId,
@@ -104,6 +114,15 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     }
   }
 
+  Future<void> removeTag(int tagId) async {
+    await ref
+        .read(serverApiServiceProvider)
+        .removeTagFromVideo(videoId: widget.videoId, tagId: tagId);
+    setState(() {
+      tags.removeWhere((tag) => tag.id == tagId);
+    });
+  }
+
   Future<void> addCreatedTagsToVideo(String videoTitle, int videoId,
       OpenAiTagGenerator tagGenerator, String videoDescription) async {
     Stopwatch stopwatch = Stopwatch()..start();
@@ -112,11 +131,14 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
 
     for (var tag in createdTags) {
       try {
-        var createdTag = await ref.read(apiServiceProvider).createTag(tag);
-        int createdTagId = createdTag['id'];
-        String createdTagName = createdTag['name'];
+        var createdTag =
+            await ref.read(serverApiServiceProvider).createTag(tag);
+        int createdTagId = createdTag.id;
+        String createdTagName = createdTag.name;
 
-        await ref.read(apiServiceProvider).addTagToVideo(videoId, createdTagId);
+        await ref
+            .read(serverApiServiceProvider)
+            .addTagToVideo(videoId: videoId, tagId: createdTagId);
 
         setState(() {
           tags.add({
@@ -132,17 +154,8 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     print('Time taken to add tags: ${stopwatch.elapsed.inMilliseconds} ms');
   }
 
-  Future<void> removeTag(int tagId) async {
-    await ref
-        .read(apiServiceProvider)
-        .removeTagFromVideo(widget.videoId, tagId);
-    setState(() {
-      tags.removeWhere((tag) => tag['id'] == tagId);
-    });
-  }
-
   Future<void> deleteTag(int tagId) async {
-    await ref.read(apiServiceProvider).deleteTag(tagId);
+    await ref.read(serverApiServiceProvider).deleteTag(tagId);
   }
 
   Future<void> addMatchingTagsToVideo(
@@ -150,20 +163,18 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     try {
       String suggestedTagName =
           await tagSuggester.suggestTag(videoTitle, videoDescription);
-      var existingTags = await ref.read(apiServiceProvider).fetchTagList();
+      var existingTags =
+          await ref.read(serverApiServiceProvider).fetchTagList();
       var matchingTag = existingTags.firstWhere(
-        (tag) => tag['name'].toString() == suggestedTagName,
-        orElse: () => null,
+        (tag) => tag.name == suggestedTagName,
       );
 
-      if (matchingTag != null) {
-        await ref
-            .read(apiServiceProvider)
-            .addTagToVideo(videoId, matchingTag['id']);
-        setState(() {
-          tags.add(matchingTag);
-        });
-      }
+      await ref
+          .read(serverApiServiceProvider)
+          .addTagToVideo(videoId: videoId, tagId: matchingTag.id);
+      setState(() {
+        tags.add(matchingTag);
+      });
     } catch (e) {
       print('Error adding matching tags: $e');
     }
@@ -186,7 +197,9 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
     return SingleChildScrollView(
         // 여기에 SingleChildScrollView를 추가합니다.
         child: FutureBuilder(
-      future: ref.read(apiServiceProvider).fetchVideoDetails(videoId),
+      future: ref
+          .read(serverApiServiceProvider)
+          .fetchVideoDetails(videoId: videoId),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -201,10 +214,10 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
         }
 
         var videoData = snapshot.data;
-        var panels = videoData['panels'] as List<dynamic>;
-        var tags = videoData['tags'] as List<dynamic>;
+        panels = videoData.panels as List<VideoPanel>;
+        var tags = videoData.tags as List<dynamic>;
 
-        var youtubeUrl = videoData['youtube_link'];
+        var youtubeUrl = videoData.youtube_link;
         final youtubeId = YoutubePlayerController.convertUrlToId(youtubeUrl);
 
         if (youtubeId == null) {
@@ -223,7 +236,7 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
             builder: (context) => Column(
               children: [
                 Text(
-                  videoData['title'],
+                  videoData.title,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 ),
@@ -286,17 +299,13 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
 
                                   await panelListAsyncValue
                                       .whenData((panelList) async {
-                                    final matchingPanel = panelList.firstWhere(
-                                      (panel) =>
-                                          panel['name'].toString() ==
-                                          searchQuery,
-                                      orElse: () => null,
+                                    final Panel matchingPanel =
+                                        panelList.firstWhere(
+                                      (panel) => panel.name == searchQuery,
                                     );
 
-                                    if (matchingPanel != null) {
-                                      await addPanel(matchingPanel['id'],
-                                          matchingPanel['name']);
-                                    } else {}
+                                    await addPanel(
+                                        matchingPanel.id, matchingPanel.name);
                                   });
                                 }
                               }
@@ -328,15 +337,6 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                           child: EditCustomButton(
                             text: '직접 추가',
                             onPressed: () async {
-                              // 추가 눌렀을 때 태그 자동 생성하고 추가하기
-                              // final videoTitle = videoData['title'];
-                              // final videoId = ref.watch(selectedVideoIdProvider);
-                              // if (videoTitle != null && videoId != null) {
-                              //   await addCreatedTagsToVideo(
-                              //       videoTitle, videoId, tagGenerator);
-                              // }
-
-                              // 추가 눌렀을 때 작성한 태그 추가하기
                               final searchQuery = ref
                                   .read(searchTagQueryProvider.notifier)
                                   .state;
@@ -357,8 +357,8 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                           padding: EdgeInsets.only(top: 8.0),
                           child: TextButton(
                             onPressed: () async {
-                              final videoTitle = videoData['title'];
-                              final videoDescription = videoData['description'];
+                              final videoTitle = videoData.title;
+                              final videoDescription = videoData.description;
                               final videoId =
                                   ref.watch(selectedVideoIdProvider);
                               if (videoTitle != null && videoId != null) {
@@ -379,8 +379,8 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                           padding: EdgeInsets.fromLTRB(0, 8, 8, 0),
                           child: TextButton(
                             onPressed: () async {
-                              final videoTitle = videoData['title'];
-                              final videoDescription = videoData['description'];
+                              final videoTitle = videoData.title;
+                              final videoDescription = videoData.description;
                               final videoId =
                                   ref.watch(selectedVideoIdProvider);
                               if (videoTitle != null && videoId != null) {
@@ -402,7 +402,7 @@ class SelectedVideoDetailsState extends ConsumerState<SelectedVideoDetails> {
                   ],
                 ),
                 Text(
-                  videoData['description'],
+                  videoData.description,
                   style: const TextStyle(
                     fontSize: 12,
                   ),

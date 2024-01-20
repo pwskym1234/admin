@@ -9,8 +9,8 @@ part of 'video.dart';
 _$VideoImpl _$$VideoImplFromJson(Map<String, dynamic> json) => _$VideoImpl(
       id: json['id'] as int,
       title: json['title'] as String,
-      description: json['description'] as String,
       thumbnail_url: json['thumbnail_url'] as String,
+      description: json['description'] as String?,
       youtube_link: json['youtube_link'] as String,
       view_count: json['view_count'] as int,
       type: json['type'] as String,
@@ -28,8 +28,8 @@ Map<String, dynamic> _$$VideoImplToJson(_$VideoImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'description': instance.description,
       'thumbnail_url': instance.thumbnail_url,
+      'description': instance.description,
       'youtube_link': instance.youtube_link,
       'view_count': instance.view_count,
       'type': instance.type,

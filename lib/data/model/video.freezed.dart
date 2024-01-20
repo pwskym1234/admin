@@ -22,8 +22,8 @@ Video _$VideoFromJson(Map<String, dynamic> json) {
 mixin _$Video {
   int get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
   String get thumbnail_url => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   String get youtube_link => throw _privateConstructorUsedError;
   int get view_count => throw _privateConstructorUsedError;
   String get type => throw _privateConstructorUsedError;
@@ -43,8 +43,8 @@ abstract class $VideoCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
-      String description,
       String thumbnail_url,
+      String? description,
       String youtube_link,
       int view_count,
       String type,
@@ -67,8 +67,8 @@ class _$VideoCopyWithImpl<$Res, $Val extends Video>
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? description = null,
     Object? thumbnail_url = null,
+    Object? description = freezed,
     Object? youtube_link = null,
     Object? view_count = null,
     Object? type = null,
@@ -84,14 +84,14 @@ class _$VideoCopyWithImpl<$Res, $Val extends Video>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
       thumbnail_url: null == thumbnail_url
           ? _value.thumbnail_url
           : thumbnail_url // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       youtube_link: null == youtube_link
           ? _value.youtube_link
           : youtube_link // ignore: cast_nullable_to_non_nullable
@@ -126,8 +126,8 @@ abstract class _$$VideoImplCopyWith<$Res> implements $VideoCopyWith<$Res> {
   $Res call(
       {int id,
       String title,
-      String description,
       String thumbnail_url,
+      String? description,
       String youtube_link,
       int view_count,
       String type,
@@ -148,8 +148,8 @@ class __$$VideoImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? title = null,
-    Object? description = null,
     Object? thumbnail_url = null,
+    Object? description = freezed,
     Object? youtube_link = null,
     Object? view_count = null,
     Object? type = null,
@@ -165,14 +165,14 @@ class __$$VideoImplCopyWithImpl<$Res>
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
       thumbnail_url: null == thumbnail_url
           ? _value.thumbnail_url
           : thumbnail_url // ignore: cast_nullable_to_non_nullable
               as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       youtube_link: null == youtube_link
           ? _value.youtube_link
           : youtube_link // ignore: cast_nullable_to_non_nullable
@@ -203,8 +203,8 @@ class _$VideoImpl implements _Video {
   _$VideoImpl(
       {required this.id,
       required this.title,
-      required this.description,
       required this.thumbnail_url,
+      this.description,
       required this.youtube_link,
       required this.view_count,
       required this.type,
@@ -221,9 +221,9 @@ class _$VideoImpl implements _Video {
   @override
   final String title;
   @override
-  final String description;
-  @override
   final String thumbnail_url;
+  @override
+  final String? description;
   @override
   final String youtube_link;
   @override
@@ -250,7 +250,7 @@ class _$VideoImpl implements _Video {
 
   @override
   String toString() {
-    return 'Video(id: $id, title: $title, description: $description, thumbnail_url: $thumbnail_url, youtube_link: $youtube_link, view_count: $view_count, type: $type, panels: $panels, tags: $tags)';
+    return 'Video(id: $id, title: $title, thumbnail_url: $thumbnail_url, description: $description, youtube_link: $youtube_link, view_count: $view_count, type: $type, panels: $panels, tags: $tags)';
   }
 
   @override
@@ -260,10 +260,10 @@ class _$VideoImpl implements _Video {
             other is _$VideoImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
             (identical(other.thumbnail_url, thumbnail_url) ||
                 other.thumbnail_url == thumbnail_url) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             (identical(other.youtube_link, youtube_link) ||
                 other.youtube_link == youtube_link) &&
             (identical(other.view_count, view_count) ||
@@ -279,8 +279,8 @@ class _$VideoImpl implements _Video {
       runtimeType,
       id,
       title,
-      description,
       thumbnail_url,
+      description,
       youtube_link,
       view_count,
       type,
@@ -305,8 +305,8 @@ abstract class _Video implements Video {
   factory _Video(
       {required final int id,
       required final String title,
-      required final String description,
       required final String thumbnail_url,
+      final String? description,
       required final String youtube_link,
       required final int view_count,
       required final String type,
@@ -320,9 +320,9 @@ abstract class _Video implements Video {
   @override
   String get title;
   @override
-  String get description;
-  @override
   String get thumbnail_url;
+  @override
+  String? get description;
   @override
   String get youtube_link;
   @override
