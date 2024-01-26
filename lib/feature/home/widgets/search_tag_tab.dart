@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/home/logic/home_controller.dart';
-import 'package:admin/data/api/apiservice.dart';
 
 class SearchTagTab extends ConsumerWidget {
   final Function(int id) onDelete;
@@ -20,7 +20,7 @@ class SearchTagTab extends ConsumerWidget {
             onChanged: (query) {
               ref.read(searchTagQueryProvider.notifier).state = query;
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: '태그 검색',
               hintText: '태그를 입력하세요',
             ),
@@ -32,7 +32,7 @@ class SearchTagTab extends ConsumerWidget {
               return tagListAsyncValue.when(
                 data: (tagDataList) {
                   if (tagDataList.isNotEmpty) {
-                    return Container(
+                    return SizedBox(
                         height: 100,
                         child: ListView.builder(
                           itemCount: tagDataList.length,
@@ -45,21 +45,22 @@ class SearchTagTab extends ConsumerWidget {
                                   onPressed: () async {
                                     try {
                                       await onDelete(tagData['id']);
+                                      // ignore: unused_result
                                       ref.refresh(tagListProvider);
                                     } catch (e) {
-                                      print('Error deleting tag: $e');
+                                      debugPrint('Error deleting tag: $e');
                                     }
                                   }),
                             );
                           },
                         ));
                   } else {
-                    return Center(
+                    return const Center(
                       child: Text('결과가 없습니다.'),
                     );
                   }
                 },
-                loading: () => CircularProgressIndicator(),
+                loading: () => const CircularProgressIndicator(),
                 error: (error, stackTrace) {
                   return Center(
                     child: Text('오류: $error'),
@@ -73,16 +74,16 @@ class SearchTagTab extends ConsumerWidget {
     );
   }
 
-  Future<List<dynamic>> _fetchAndFilterTagList(WidgetRef ref) async {
-    final searchQuery = ref.read(searchTagQueryProvider.notifier).state ?? "";
-    final apiService = ref.read(apiServiceProvider);
-    final tagList = await apiService.fetchLiveTagList();
+  // Future<List<dynamic>> _fetchAndFilterTagList(WidgetRef ref) async {
+  //   final searchQuery = ref.read(searchTagQueryProvider.notifier).state ?? "";
+  //   final apiService = ref.read(apiServiceProvider);
+  //   final tagList = await apiService.fetchLiveTagList();
 
-    return searchQuery.isNotEmpty
-        ? tagList
-            .where(
-                (tagData) => tagData['name'].toString().contains(searchQuery))
-            .toList()
-        : tagList;
-  }
+  //   return searchQuery.isNotEmpty
+  //       ? tagList
+  //           .where(
+  //               (tagData) => tagData['name'].toString().contains(searchQuery))
+  //           .toList()
+  //       : tagList;
+  // }
 }

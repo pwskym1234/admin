@@ -5,7 +5,8 @@ class PanelThumbnailButton extends StatelessWidget {
   final VoidCallback onSelectThumbnail;
   final VoidCallback onCancelThumbnail;
 
-  PanelThumbnailButton({
+  const PanelThumbnailButton({
+    super.key,
     required this.imageName,
     required this.onSelectThumbnail,
     required this.onCancelThumbnail,
@@ -18,30 +19,30 @@ class PanelThumbnailButton extends StatelessWidget {
       children: [
         OutlinedButton(
           onPressed: onSelectThumbnail,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: imageName != null ? Colors.black : Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            minimumSize: const Size(160, 200),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.photo),
+              const Icon(Icons.photo),
               Text(
                 imageName != null ? '사진 첨부됨' : '사진 첨부',
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                 ),
               ),
             ],
           ),
-          style: OutlinedButton.styleFrom(
-            primary: imageName != null ? Colors.black : Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            minimumSize: Size(160, 200),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          ),
         ),
         if (imageName != null) // 이미지가 선택된 경우에만 X 버튼을 표시
           IconButton(
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
             onPressed: onCancelThumbnail,
           ),
       ],

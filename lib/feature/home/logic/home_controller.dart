@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/data/api/apiservice.dart';
 
@@ -17,7 +19,7 @@ class VideoListNotifier extends StateNotifier<List<dynamic>> {
       final videos = await _apiService.fetchVideoList(type, offset, limit);
       state = videos;
     } catch (e) {
-      print("API 호출 중 오류가 발생했습니다: $e");
+      debugPrint("API 호출 중 오류가 발생했습니다: $e");
       state = [];
     }
   }
@@ -35,13 +37,12 @@ class UntaggedVideoListNotifier extends StateNotifier<List<dynamic>> {
   ApiService get _apiService => ref.read(apiServiceProvider);
 
   Future<void> getUntaggedVideos(
-      String type, String tag_added, int offset, int limit) async {
+      String type, String tagAdded, int offset, int limit) async {
     try {
       final videos = await _apiService.fetchUntaggedVideoList(
-          type, tag_added, offset, limit);
+          type, tagAdded, offset, limit);
       state = videos;
     } catch (e) {
-      print("API 호출 중 오류가 발생했습니다: $e");
       state = [];
     }
   }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
-class CreatePanelButton extends StatelessWidget {
-  final VoidCallback onCreatePanel;
+class UpdateTagButton extends StatelessWidget {
+  final Function(String?) onUpdateTag;
+  final String? searchTagToUpdate;
 
-  const CreatePanelButton({super.key, required this.onCreatePanel});
+  const UpdateTagButton(
+      {Key? key, required this.onUpdateTag, required this.searchTagToUpdate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onCreatePanel,
+      onPressed: () => onUpdateTag(searchTagToUpdate),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white, backgroundColor: Colors.black, // 글씨색 변경
         minimumSize: const Size(160, 50), // 버튼의 최소 크기 설정
@@ -19,7 +22,7 @@ class CreatePanelButton extends StatelessWidget {
         ),
       ),
       child: const Text(
-        '패널 생성',
+        '태그 업데이트',
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );

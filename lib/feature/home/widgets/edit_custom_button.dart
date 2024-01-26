@@ -4,7 +4,8 @@ class EditCustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  EditCustomButton({
+  const EditCustomButton({
+    super.key,
     required this.text,
     required this.onPressed,
   });
@@ -15,12 +16,12 @@ class EditCustomButton extends StatelessWidget {
       padding: const EdgeInsets.only(top: 35),
       child: TextButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white),
-        ),
         style: TextButton.styleFrom(
           backgroundColor: Colors.black,
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

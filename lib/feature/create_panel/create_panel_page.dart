@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/create_panel/logic/create_panel_controller.dart';
 // import 'package:file_picker/file_picker.dart';
@@ -7,11 +8,15 @@ import 'package:admin/feature/create_panel/widgets/panel_ideology_category_butto
 import 'package:admin/feature/create_panel/widgets/create_panel_button.dart';
 import 'package:admin/feature/create_panel/widgets/panel_name_textfield.dart';
 import 'package:admin/feature/create_panel/widgets/panel_thumbnail_button.dart';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'dart:convert';
 
 class CreatPanelPage extends ConsumerStatefulWidget {
+  const CreatPanelPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _CreatePanelPageState createState() => _CreatePanelPageState();
 }
 
@@ -37,7 +42,7 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
             imageByte = base64.decode(reader.result.toString().split(",").last);
             imageName = file.name;
           });
-          print("File selected successfully.");
+          // print("File selected successfully.");
         });
       }
     });
@@ -81,7 +86,7 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
     if (politicalTypeId != null) {
       await ApiService()
           .createPanel(panelName, politicalTypeId, imageByte, imageName);
-      print(politicalTypeId);
+      // print(politicalTypeId);
 
       resetPage();
     }
@@ -94,30 +99,28 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
     void selectCategory(int politicalTypeId) {
       if (selectedPoliticalTypeId == politicalTypeId) {
         ref.read(selectedPoliticalTypeIdProvider.notifier).state = null;
-        print(ref.watch(selectedPoliticalTypeIdProvider));
-        print(politicalTypeId);
+        // print(ref.watch(selectedPoliticalTypeIdProvider));
+        // print(politicalTypeId);
       } else {
         ref.read(selectedPoliticalTypeIdProvider.notifier).state =
             politicalTypeId;
-        print(ref.watch(selectedPoliticalTypeIdProvider));
-        print(politicalTypeId);
       }
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('패널 추가'),
+        title: const Text('패널 추가'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.5,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 PanelNameTextField(controller: panelNameController),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 PanelThumbnailButton(
                   imageName: imageName,
                   onSelectThumbnail: selectThumbnail,
@@ -128,12 +131,12 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
                     });
                   },
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 PoliticalTypeButtonRow(
                   selectedPoliticalTypeId: selectedPoliticalTypeId,
                   onSelectPoliticalType: selectCategory,
                 ),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
                 CreatePanelButton(onCreatePanel: createPanel),
               ],
             ),
@@ -143,6 +146,12 @@ class _CreatePanelPageState extends ConsumerState<CreatPanelPage> {
     );
   }
 }
+
+
+
+
+
+
 
 // class _EmptyPageState extends ConsumerState<EmptyPage> {
 //   final TextEditingController panelNameController = TextEditingController();

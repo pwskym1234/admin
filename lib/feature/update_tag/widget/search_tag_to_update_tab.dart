@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:admin/feature/home/logic/home_controller.dart';
+import 'package:admin/feature/update_tag/logic/update_tag_controller.dart';
 
-class SearchPanelTab extends ConsumerWidget {
-  const SearchPanelTab({super.key});
-
+class SearchTagToUpdateTab extends ConsumerWidget {
+  const SearchTagToUpdateTab({
+    Key? key,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
@@ -14,28 +15,28 @@ class SearchPanelTab extends ConsumerWidget {
         children: [
           TextField(
             onChanged: (query) {
-              ref.read(searchPanelQueryProvider.notifier).state = query;
+              ref.read(searchTagToUpdateQueryProvider.notifier).state = query;
             },
             decoration: const InputDecoration(
-              labelText: '패널 검색',
-              hintText: '패널을 입력하세요',
+              labelText: '태그 검색',
+              hintText: '태그를 입력하세요',
             ),
           ),
           Consumer(
             builder: (context, ref, child) {
-              final panelListAsyncValue = ref.watch(panelListProvider);
+              final tagListAsyncValue = ref.watch(searchBarTagListProvider);
 
-              return panelListAsyncValue.when(
-                data: (panelDataList) {
-                  if (panelDataList.isNotEmpty) {
+              return tagListAsyncValue.when(
+                data: (tagDataList) {
+                  if (tagDataList.isNotEmpty) {
                     return SizedBox(
                         height: 100,
                         child: ListView.builder(
-                          itemCount: panelDataList.length,
+                          itemCount: tagDataList.length,
                           itemBuilder: (context, index) {
-                            final panelData = panelDataList[index];
+                            final tagData = tagDataList[index];
                             return ListTile(
-                              title: Text(panelData['name'].toString()),
+                              title: Text(tagData['name'].toString()),
                             );
                           },
                         ));

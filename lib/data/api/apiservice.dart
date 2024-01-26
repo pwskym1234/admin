@@ -1,4 +1,9 @@
+// ignore_for_file: non_constant_identifier_names
+
+// ignore: depend_on_referenced_packages
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) {
@@ -26,7 +31,7 @@ class ApiService {
       return response.data;
     } catch (e) {
       // 로깅: 예외 발생 시 출력
-      print('Error fetching video list: $e');
+      debugPrint('Error fetching video list: $e');
       throw Exception('Error fetching video list: $e');
     }
   }
@@ -48,7 +53,7 @@ class ApiService {
       return response.data;
     } catch (e) {
       // 로깅: 예외 발생 시 출력
-      print('Error fetching video list: $e');
+      debugPrint('Error fetching video list: $e');
       throw Exception('Error fetching video list: $e');
     }
   }
@@ -92,9 +97,9 @@ class ApiService {
     });
 
     if (response.statusCode == 200) {
-      print('Panel added successfully');
+      debugPrint('Panel added successfully');
     } else {
-      print('Failed to add panel');
+      debugPrint('Failed to add panel');
     }
   }
 
@@ -109,12 +114,12 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        print('Panel successfully removed');
+        debugPrint('Panel successfully removed');
       } else {
-        print('Failed to remove panel');
+        debugPrint('Failed to remove panel');
       }
     } catch (e) {
-      print('Exception occurred while removing panel: $e');
+      debugPrint('Exception occurred while removing panel: $e');
       throw Exception('Exception occurred while removing panel: $e');
     }
   }
@@ -139,9 +144,9 @@ class ApiService {
     });
 
     if (response.statusCode == 200) {
-      print('Tag added successfully');
+      debugPrint('Tag added successfully');
     } else {
-      print('Failed to add tag');
+      debugPrint('Failed to add tag');
     }
   }
 
@@ -156,12 +161,12 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        print('Tag successfully removed');
+        debugPrint('Tag successfully removed');
       } else {
-        print('Failed to remove tag');
+        debugPrint('Failed to remove tag');
       }
     } catch (e) {
-      print('Exception occurred while removing tag: $e');
+      debugPrint('Exception occurred while removing tag: $e');
       throw Exception('Exception occurred while removing tag: $e');
     }
   }
@@ -186,14 +191,14 @@ class ApiService {
       );
 
       if (response.statusCode == 201) {
-        print('Tag created successfully: ${response.data}');
+        debugPrint('Tag created successfully: ${response.data}');
         return response.data;
       } else {
-        print('Failed to create tag');
+        debugPrint('Failed to create tag');
         throw Exception('Failed to create tag');
       }
     } catch (e) {
-      print('Exception occurred while creating tag: $e');
+      debugPrint('Exception occurred while creating tag: $e');
       throw Exception('Exception occurred while creating tag: $e');
     }
   }
@@ -213,14 +218,14 @@ class ApiService {
           data: FormData.fromMap(data));
 
       if (response.statusCode == 201) {
-        print('Panel created successfully: ${response.data}');
+        debugPrint('Panel created successfully: ${response.data}');
         return response.data;
       } else {
-        print('Failed to create panel');
+        debugPrint('Failed to create panel');
         throw Exception('Failed to create panel');
       }
     } catch (e) {
-      print('Exception occurred while creating panel: $e');
+      debugPrint('Exception occurred while creating panel: $e');
       throw Exception('Exception occurred while creating panel: $e');
     }
   }
@@ -236,15 +241,35 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        print('Tag deleted successfully: ${response.data}');
+        debugPrint('Tag deleted successfully: ${response.data}');
         return response.data;
       } else {
-        print('Failed to delete tag');
+        debugPrint('Failed to delete tag');
         throw Exception('Failed to delete tag');
       }
     } catch (e) {
-      print('Exception occurred while deleting tag: $e');
+      debugPrint('Exception occurred while deleting tag: $e');
       throw Exception('Exception occurred while deleting tag: $e');
+    }
+  }
+
+  Future<dynamic> updateTag(int tagId, int status) async {
+    try {
+      final response = await _dio.put(
+        'https://a-zit.tv/api/v1/tag?id=$tagId',
+        data: {'status': status},
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('Tag updated successfully: ${response.data}');
+        return response.data;
+      } else {
+        debugPrint('Failed to update tag');
+        throw Exception('Failed to update tag');
+      }
+    } catch (e) {
+      debugPrint('Exception occurred while updating tag: $e');
+      throw Exception('Exception occurred while updating tag: $e');
     }
   }
 }

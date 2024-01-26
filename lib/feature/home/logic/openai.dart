@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:openai_dart/openai_dart.dart';
 import 'package:admin/data/api/apiservice.dart';
 
@@ -12,7 +13,7 @@ class OpenAiTagGenerator {
 
     final response = await client.createChatCompletion(
       request: CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId('gpt-4'),
+        model: const ChatCompletionModel.modelId('gpt-4'),
         messages: [
           ChatCompletionMessage.system(
             content:
@@ -59,7 +60,7 @@ class OpenAiTagSuggester {
 
     final response = await client.createChatCompletion(
       request: CreateChatCompletionRequest(
-        model: ChatCompletionModel.modelId('gpt-4'),
+        model: const ChatCompletionModel.modelId('gpt-4'),
         messages: [
           ChatCompletionMessage.system(
             content: prompt,
@@ -69,7 +70,7 @@ class OpenAiTagSuggester {
       ),
     );
     final text = response.choices.first.message.content?.trim();
-    print(text);
+    debugPrint(text);
     return text ?? '';
   }
 }

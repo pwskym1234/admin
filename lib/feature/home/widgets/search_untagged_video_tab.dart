@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:admin/feature/home/logic/home_controller.dart';
-import 'package:admin/data/api/apiservice.dart';
 
 class SearchUntaggedVideoTab extends ConsumerWidget {
+  const SearchUntaggedVideoTab({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
@@ -14,7 +16,7 @@ class SearchUntaggedVideoTab extends ConsumerWidget {
             onChanged: (query) {
               ref.read(searchVideoQueryProvider.notifier).state = query;
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: '비디오 제목 검색',
               hintText: '비디오 제목를 입력하세요',
             ),
