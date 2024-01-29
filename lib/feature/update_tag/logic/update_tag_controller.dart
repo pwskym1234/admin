@@ -14,12 +14,14 @@ final tagListToUpdateProvider =
 });
 
 class TagListNotifier extends StateNotifier<List<dynamic>> {
-  TagListNotifier(this.ref) : super([]);
+  TagListNotifier(this.ref) : super([]) {
+    getTagsToUpdate();
+  }
 
   final Ref ref;
   ApiService get _apiService => ref.read(apiServiceProvider);
 
-  Future<void> getTags() async {
+  Future<void> getTagsToUpdate() async {
     try {
       final tags = await _apiService.fetchTagList();
       state = tags;

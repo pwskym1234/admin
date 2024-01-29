@@ -41,6 +41,10 @@ class _UpdateTagPageState extends ConsumerState<UpdateTagPage> {
   //   }
   // }
 
+  Future<void> deleteTag(int tagId) async {
+    await ref.read(apiServiceProvider).deleteTag(tagId);
+  }
+
   void updateTag(String? tagName) async {
     print('Updating tag: $tagName');
     final tagListAsyncValue = ref.watch(searchBarTagListProvider);
@@ -114,9 +118,9 @@ class _UpdateTagPageState extends ConsumerState<UpdateTagPage> {
             ),
           ),
           const VerticalDivider(width: 1),
-          const SizedBox(
+          SizedBox(
             width: 300,
-            child: TagToUpdateList(),
+            child: TagToUpdateList(onDelete: (id) => deleteTag(id)),
           ),
         ],
       ),
